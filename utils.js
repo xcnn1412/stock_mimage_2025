@@ -535,6 +535,12 @@ class LogUtils {
      */
     static async logActivity(action, tableName, recordId = null, oldData = null, newData = null, userId = null) {
         try {
+            // ตรวจสอบว่ามี LogUtils หรือไม่
+            if (typeof window.LogUtils === 'undefined') {
+                console.warn('LogUtils not available');
+                return;
+            }
+            
             const logData = {
                 action: action,
                 table_name: tableName,
@@ -562,6 +568,7 @@ class LogUtils {
         } catch (error) {
             console.error('Failed to log activity:', error);
             // ไม่ throw error เพื่อไม่ให้กระทบการทำงานหลัก
+            return null;
         }
     }
     

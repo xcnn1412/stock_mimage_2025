@@ -1472,11 +1472,15 @@
                     showNotification('ซิงค์ข้อมูลสำเร็จ!', 'success');
                     
                     // Log the sync activity
-                    await LogUtils.logActivity('sync', 'system', null, null, { 
-                        items_count: items.length,
-                        bags_count: bags.length,
-                        events_count: events.length
-                    });
+                    try {
+                        await LogUtils.logActivity('sync', 'system', null, null, { 
+                            items_count: items.length,
+                            bags_count: bags.length,
+                            events_count: events.length
+                        });
+                    } catch (error) {
+                        console.warn('Failed to log sync activity:', error);
+                    }
                 } else {
                     showNotification('ไม่สามารถซิงค์ข้อมูลได้', 'error');
                 }
@@ -2187,7 +2191,11 @@
                         showNotification('เพิ่มสินค้าสำเร็จ!', 'success');
                         
                         // Log the activity
-                        await LogUtils.logActivity('create', 'items', result.id || formData.id, null, formData);
+                        try {
+                            await LogUtils.logActivity('create', 'items', result.id || formData.id, null, formData);
+                        } catch (error) {
+                            console.warn('Failed to log activity:', error);
+                        }
                     } catch (error) {
                         showNotification('ไม่สามารถเพิ่มสินค้าได้: ' + error.message, 'error');
                     }
@@ -2466,7 +2474,11 @@
                         showNotification('สร้างกระเป๋าสำเร็จ!', 'success');
                         
                         // Log the activity
-                        await LogUtils.logActivity('create', 'bags', result.id || formData.id, null, formData);
+                        try {
+                            await LogUtils.logActivity('create', 'bags', result.id || formData.id, null, formData);
+                        } catch (error) {
+                            console.warn('Failed to log activity:', error);
+                        }
                     } catch (error) {
                         showNotification('ไม่สามารถสร้างกระเป๋าได้: ' + error.message, 'error');
                     }
@@ -2525,7 +2537,11 @@
                 showNotification('ลบกระเป๋าสำเร็จ!', 'success');
                 
                 // Log the activity
-                await LogUtils.logActivity('delete', 'bags', bagId, bag, null);
+                try {
+                    await LogUtils.logActivity('delete', 'bags', bagId, bag, null);
+                } catch (error) {
+                    console.warn('Failed to log activity:', error);
+                }
             } catch (error) {
                 showNotification('ไม่สามารถลบกระเป๋าได้: ' + error.message, 'error');
             }
@@ -2658,7 +2674,11 @@
                         showNotification('สร้างอีเวนต์สำเร็จ!', 'success');
                         
                         // Log the activity
-                        await LogUtils.logActivity('create', 'events', result.id || formData.id, null, formData);
+                        try {
+                            await LogUtils.logActivity('create', 'events', result.id || formData.id, null, formData);
+                        } catch (error) {
+                            console.warn('Failed to log activity:', error);
+                        }
                     } catch (error) {
                         showNotification('ไม่สามารถสร้างอีเวนต์ได้: ' + error.message, 'error');
                     }
@@ -3348,7 +3368,11 @@
                                 console.log(`Successfully updated item ${update.itemId} to ${update.newStatus}:`, result);
                                 
                                 // Log the activity
-                                await LogUtils.logActivity('update', 'items', update.itemId, { status: update.oldStatus }, { status: update.newStatus });
+                                try {
+                                    await LogUtils.logActivity('update', 'items', update.itemId, { status: update.oldStatus }, { status: update.newStatus });
+                                } catch (error) {
+                                    console.warn('Failed to log activity:', error);
+                                }
                             }
                         }
                         
@@ -3412,7 +3436,11 @@
                 showNotification('ลบอีเวนต์สำเร็จ!', 'success');
                 
                 // Log the activity
-                await LogUtils.logActivity('delete', 'events', eventId, event, null);
+                try {
+                    await LogUtils.logActivity('delete', 'events', eventId, event, null);
+                } catch (error) {
+                    console.warn('Failed to log activity:', error);
+                }
             } catch (error) {
                 showNotification('ไม่สามารถลบอีเวนต์ได้: ' + error.message, 'error');
             }
@@ -3957,6 +3985,12 @@
             const logsSection = document.getElementById('logs');
             if (!logsSection) return;
             
+            // ตรวจสอบว่า LogUtils พร้อมใช้งานหรือไม่
+            if (typeof LogUtils === 'undefined') {
+                console.warn('LogUtils not available, skipping logs section initialization');
+                return;
+            }
+            
             // Add logs section HTML if not exists
             if (!logsSection.querySelector('.logs-container')) {
                 logsSection.innerHTML = `
@@ -4039,6 +4073,12 @@
         
         async function loadLogs(page = 1) {
             try {
+                // ตรวจสอบว่า LogUtils พร้อมใช้งานหรือไม่
+                if (typeof LogUtils === 'undefined') {
+                    console.warn('LogUtils not available');
+                    return;
+                }
+                
                 const filters = {
                     page: page,
                     limit: 20,
@@ -4075,7 +4115,7 @@
                 filters.actions.forEach(action => {
                     const option = document.createElement('option');
                     option.value = action;
-                    option.textContent = LogUtils.getActionText(action);
+                    option.textContent = LogUtils.getActionText ? LogUtils.getActionText(action) : action;
                     if (action === currentValue) option.selected = true;
                     actionFilter.appendChild(option);
                 });
@@ -4087,7 +4127,7 @@
                 filters.tables.forEach(table => {
                     const option = document.createElement('option');
                     option.value = table;
-                    option.textContent = LogUtils.getTableText(table);
+                    option.textContent = LogUtils.getTableText ? LogUtils.getTableText(table) : table;
                     if (table === currentValue) option.selected = true;
                     tableFilter.appendChild(option);
                 });
@@ -4110,19 +4150,19 @@
             }
             
             tbody.innerHTML = logs.map(log => {
-                const formattedLog = LogUtils.formatLogData(log);
+                const formattedLog = LogUtils.formatLogData ? LogUtils.formatLogData(log) : log;
                 return `
                     <tr style="border-bottom: 1px solid #dee2e6;">
                         <td style="padding: 1rem; font-size: 0.9rem;">
-                            ${formattedLog.formatted_date}
+                            ${formattedLog.formatted_date || new Date(log.created_at).toLocaleString('th-TH')}
                         </td>
                         <td style="padding: 1rem;">
-                            <span class="badge" style="background: ${getActionColor(formattedLog.action)}; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem;">
-                                ${formattedLog.action_text}
+                            <span class="badge" style="background: ${getActionColor(formattedLog.action || log.action)}; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem;">
+                                ${formattedLog.action_text || (formattedLog.action || log.action)}
                             </span>
                         </td>
                         <td style="padding: 1rem;">
-                            ${formattedLog.table_text}
+                            ${formattedLog.table_text || (formattedLog.table_name || log.table_name)}
                         </td>
                         <td style="padding: 1rem; font-size: 0.9rem;">
                             ${formatLogDetails(formattedLog)}
@@ -4224,6 +4264,11 @@
             }
             
             try {
+                if (typeof LogUtils === 'undefined' || !LogUtils.clearOldLogs) {
+                    showNotification('ฟีเจอร์ Logs ไม่พร้อมใช้งาน', 'error');
+                    return;
+                }
+                
                 await LogUtils.clearOldLogs(30);
                 showNotification('ลบข้อมูล logs เก่าเรียบร้อย', 'success');
                 loadLogs(1);
