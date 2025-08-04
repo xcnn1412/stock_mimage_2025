@@ -1260,6 +1260,10 @@
                             <input type="text" id="event-responsible" required>
                         </div>
                         <div class="form-group">
+                            <label for="event-staff">ชื่อสตาฟดูแลงาน *</label>
+                            <input type="text" id="event-staff" placeholder="กรอกชื่อสตาฟที่ดูแลงานในอีเวนต์" required>
+                        </div>
+                        <div class="form-group">
                             <label for="event-date">วันที่อีเวนต์ *</label>
                             <input type="date" id="event-date" required>
                         </div>
@@ -2634,6 +2638,7 @@
                         location: document.getElementById('event-location').value.trim(),
                         customer: document.getElementById('event-customer').value.trim(),
                         responsible: document.getElementById('event-responsible').value.trim(),
+                        staff: document.getElementById('event-staff').value.trim(),
                         date: document.getElementById('event-date').value,
                         time: document.getElementById('event-time').value,
                         bagIds: selectedBags,
@@ -2641,7 +2646,7 @@
                     };
 
                     if (!formData.name || !formData.location || !formData.customer || 
-                        !formData.responsible || !formData.date || !formData.time) {
+                        !formData.responsible || !formData.staff || !formData.date || !formData.time) {
                         showNotification('กรุณากรอกข้อมูลให้ครบถ้วน', 'error');
                         return;
                     }
@@ -2727,6 +2732,7 @@
                         <p><strong>สถานที่:</strong> ${event.location}</p>
                         <p><strong>ลูกค้า:</strong> ${event.customer}</p>
                         <p><strong>ผู้รับผิดชอบ:</strong> ${event.responsible}</p>
+                        <p><strong>สตาฟดูแลงาน:</strong> ${event.staff || 'ไม่ระบุ'}</p>
                         <p><strong>วันที่:</strong> ${formatDate(event.date)} ${event.time || ''}</p>
                         <p><strong>จำนวนกระเป๋า:</strong> ${event.bag_count || 0} ใบ</p>
                         <p><strong>สร้างเมื่อ:</strong> ${formatDate(event.created_at)}</p>
@@ -3487,6 +3493,7 @@
                             <p><strong>สถานที่:</strong> ${event.location}</p>
                             <p><strong>ลูกค้า:</strong> ${event.customer}</p>
                             <p><strong>ผู้รับผิดชอบ:</strong> ${event.responsible}</p>
+                            <p><strong>สตาฟดูแลงาน:</strong> ${event.staff || 'ไม่ระบุ'}</p>
                             <p><strong>วันที่:</strong> ${formatDate(event.date)} ${event.time || ''}</p>
                             <p><strong>สถานะ:</strong> <span class="status-badge status-${event.status}">${event.status === 'active' ? 'กำลังดำเนินการ' : 'เสร็จสิ้น'}</span></p>
                             <p><strong>จำนวนกระเป๋า:</strong> ${eventBags.length} ใบ</p>
@@ -3540,6 +3547,8 @@
                     <div class="card-content">
                         <p><strong>สถานที่:</strong> ${event.location}</p>
                         <p><strong>ลูกค้า:</strong> ${event.customer}</p>
+                        <p><strong>ผู้รับผิดชอบ:</strong> ${event.responsible}</p>
+                        <p><strong>สตาฟดูแลงาน:</strong> ${event.staff || 'ไม่ระบุ'}</p>
                         <p><strong>วันที่:</strong> ${formatDate(event.date)}</p>
                         <p><strong>กระเป๋า:</strong> ${event.bag_count || 0} ใบ</p>
                     </div>
