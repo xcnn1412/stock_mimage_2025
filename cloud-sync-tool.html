@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌩️ Cloud Database Sync Tool</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 300;
+        }
+        
+        .content {
+            padding: 2rem;
+        }
+        
+        .sync-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border: 1px solid #e9ecef;
+        }
+        
+        .sync-section h3 {
+            color: #2c3e50;
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .btn.success {
+            background: #27ae60;
+        }
+        
+        .btn.success:hover {
+            background: #229954;
+        }
+        
+        .btn.danger {
+            background: #e74c3c;
+        }
+        
+        .btn.danger:hover {
+            background: #c0392b;
+        }
+        
+        .status {
+            margin: 1rem 0;
+            padding: 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .data-preview {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .connection-form {
+            display: grid;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+        }
+        
+        .form-group input {
+            padding: 0.75rem;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌩️ Cloud Database Sync Tool</h1>
+            <p>เชื่อมต่อและซิงค์ข้อมูลระหว่าง Cloud และ Local</p>
+        </div>
+        
+        <div class="content">
+            <!-- Cloud Connection Section -->
+            <div class="sync-section">
+                <h3>☁️ การเชื่อมต่อ Cloud Database</h3>
+                <div class="connection-form">
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Cloud API URL</label>
+                            <input type="text" id="cloudApiUrl" value="https://your-domain.com/api" placeholder="https://example.com/api">
+                        </div>
+                        <div class="form-group">
+                            <label>API Key (ถ้ามี)</label>
+                            <input type="text" id="apiKey" placeholder="API Key (optional)">
+                        </div>
+                    </div>
+                    <button class="btn" onclick="testCloudConnection()">🔌 ทดสอบการเชื่อมต่อ Cloud</button>
+                </div>
+                <div id="connectionStatus"></div>
+            </div>
+            
+            <!-- Sync Actions Section -->
+            <div class="sync-section">
+                <h3>⬇️ ดาวน์โหลดข้อมูลจาก Cloud</h3>
+                <button class="btn success" onclick="downloadFromCloud()">📥 ดาวน์โหลดข้อมูลทั้งหมด</button>
+                <button class="btn" onclick="downloadItems()">📦 ดาวน์โหลดเฉพาะสินค้า</button>
+                <button class="btn" onclick="downloadBags()">🎒 ดาวน์โหลดเฉพาะกระเป๋า</button>
+                <button class="btn" onclick="downloadEvents()">📅 ดาวน์โหลดเฉพาะอีเวนต์</button>
+                
+                <div class="loading" id="loadingIndicator">
+                    <div class="spinner"></div>
+                    <p>กำลังดาวน์โหลดข้อมูล...</p>
+                </div>
+                
+                <div id="downloadStatus"></div>
+            </div>
+            
+            <!-- Local Data Section -->
+            <div class="sync-section">
+                <h3>💾 ข้อมูล Local ปัจจุบัน</h3>
+                <div class="stats" id="localStats">
+                    <div class="stat-card">
+                        <div class="stat-number" id="localItems">0</div>
+                        <div class="stat-label">สินค้า</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="localBags">0</div>
+                        <div class="stat-label">กระเป๋า</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="localEvents">0</div>
+                        <div class="stat-label">อีเวนต์</div>
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="refreshLocalData()">🔄 รีเฟรชข้อมูล Local</button>
+                <button class="btn danger" onclick="clearLocalData()">🗑️ ล้างข้อมูล Local</button>
+            </div>
+            
+            <!-- Data Preview Section -->
+            <div class="sync-section">
+                <h3>👁️ ตัวอย่างข้อมูล</h3>
+                <button class="btn" onclick="previewCloudData()">👀 ดูข้อมูล Cloud</button>
+                <button class="btn" onclick="previewLocalData()">💽 ดูข้อมูล Local</button>
+                <div class="data-preview" id="dataPreview"></div>
+            </div>
+            
+            <!-- Export/Import Section -->
+            <div class="sync-section">
+                <h3>💾 Backup & Restore</h3>
+                <button class="btn" onclick="exportToFile()">📤 Export เป็นไฟล์</button>
+                <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importFromFile()">
+                <button class="btn" onclick="document.getElementById('importFile').click()">📁 Import จากไฟล์</button>
+                <button class="btn success" onclick="uploadToCloud()">☁️ อัพโหลดไป Cloud</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        let cloudApiUrl = '';
+        let localData = {
+            items: [],
+            bags: [],
+            events: []
+        };
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadLocalData();
+            updateLocalStats();
+        });
+        
+        // Cloud Connection
+        async function testCloudConnection() {
+            cloudApiUrl = document.getElementById('cloudApiUrl').value;
+            const apiKey = document.getElementById('apiKey').value;
+            
+            if (!cloudApiUrl) {
+                showStatus('connectionStatus', 'กรุณาระบุ Cloud API URL', 'error');
+                return;
+            }
+            
+            try {
+                showStatus('connectionStatus', 'กำลังทดสอบการเชื่อมต่อ...', 'info');
+                
+                const response = await fetch(`${cloudApiUrl}/sync.php`, {
+                    headers: apiKey ? { 'Authorization': `Bearer ${apiKey}` } : {}
+                });
+                
+                if (response.ok) {
+                    showStatus('connectionStatus', '✅ เชื่อมต่อ Cloud สำเร็จ!', 'success');
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+            } catch (error) {
+                showStatus('connectionStatus', `❌ เชื่อมต่อไม่สำเร็จ: ${error.message}`, 'error');
+            }
+        }
+        
+        // Download from Cloud
+        async function downloadFromCloud() {
+            if (!cloudApiUrl) {
+                showStatus('downloadStatus', 'กรุณาทดสอบการเชื่อมต่อ Cloud ก่อน', 'error');
+                return;
+            }
+            
+            showLoading(true);
+            
+            try {
+                const response = await fetch(`${cloudApiUrl}/sync.php`);
+                const cloudData = await response.json();
+                
+                if (cloudData.items) {
+                    localStorage.setItem('office-items', JSON.stringify(cloudData.items));
+                    localData.items = cloudData.items;
+                }
+                
+                if (cloudData.bags) {
+                    localStorage.setItem('office-bags', JSON.stringify(cloudData.bags));
+                    localData.bags = cloudData.bags;
+                }
+                
+                if (cloudData.events) {
+                    localStorage.setItem('office-events', JSON.stringify(cloudData.events));
+                    localData.events = cloudData.events;
+                }
+                
+                updateLocalStats();
+                showStatus('downloadStatus', 
+                    `✅ ดาวน์โหลดสำเร็จ! สินค้า: ${cloudData.items?.length || 0}, กระเป๋า: ${cloudData.bags?.length || 0}, อีเวนต์: ${cloudData.events?.length || 0}`, 
+                    'success'
+                );
+                
+            } catch (error) {
+                showStatus('downloadStatus', `❌ ดาวน์โหลดไม่สำเร็จ: ${error.message}`, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        // Download specific data
+        async function downloadItems() {
+            await downloadSpecificData('items.php', 'items', 'สินค้า');
+        }
+        
+        async function downloadBags() {
+            await downloadSpecificData('bags.php', 'bags', 'กระเป๋า');
+        }
+        
+        async function downloadEvents() {
+            await downloadSpecificData('events.php', 'events', 'อีเวนต์');
+        }
+        
+        async function downloadSpecificData(endpoint, dataType, label) {
+            if (!cloudApiUrl) {
+                showStatus('downloadStatus', 'กรุณาทดสอบการเชื่อมต่อ Cloud ก่อน', 'error');
+                return;
+            }
+            
+            showLoading(true);
+            
+            try {
+                const response = await fetch(`${cloudApiUrl}/${endpoint}`);
+                const data = await response.json();
+                
+                localStorage.setItem(`office-${dataType}`, JSON.stringify(data));
+                localData[dataType] = data;
+                
+                updateLocalStats();
+                showStatus('downloadStatus', `✅ ดาวน์โหลด${label}สำเร็จ! จำนวน: ${data.length} รายการ`, 'success');
+                
+            } catch (error) {
+                showStatus('downloadStatus', `❌ ดาวน์โหลด${label}ไม่สำเร็จ: ${error.message}`, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        // Local Data Management
+        function loadLocalData() {
+            localData.items = JSON.parse(localStorage.getItem('office-items') || '[]');
+            localData.bags = JSON.parse(localStorage.getItem('office-bags') || '[]');
+            localData.events = JSON.parse(localStorage.getItem('office-events') || '[]');
+        }
+        
+        function updateLocalStats() {
+            document.getElementById('localItems').textContent = localData.items.length;
+            document.getElementById('localBags').textContent = localData.bags.length;
+            document.getElementById('localEvents').textContent = localData.events.length;
+        }
+        
+        function refreshLocalData() {
+            loadLocalData();
+            updateLocalStats();
+            showStatus('downloadStatus', '🔄 รีเฟรชข้อมูล Local แล้ว', 'info');
+        }
+        
+        function clearLocalData() {
+            if (confirm('คุณแน่ใจหรือไม่ที่จะล้างข้อมูล Local ทั้งหมด?')) {
+                localStorage.removeItem('office-items');
+                localStorage.removeItem('office-bags');
+                localStorage.removeItem('office-events');
+                
+                localData = { items: [], bags: [], events: [] };
+                updateLocalStats();
+                
+                showStatus('downloadStatus', '🗑️ ล้างข้อมูล Local แล้ว', 'info');
+            }
+        }
+        
+        // Data Preview
+        async function previewCloudData() {
+            if (!cloudApiUrl) {
+                showStatus('downloadStatus', 'กรุณาทดสอบการเชื่อมต่อ Cloud ก่อน', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${cloudApiUrl}/sync.php`);
+                const data = await response.json();
+                
+                const preview = document.getElementById('dataPreview');
+                preview.innerHTML = `
+                    <h4>☁️ ข้อมูลใน Cloud:</h4>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+                
+            } catch (error) {
+                showStatus('downloadStatus', `❌ ไม่สามารถดูข้อมูล Cloud: ${error.message}`, 'error');
+            }
+        }
+        
+        function previewLocalData() {
+            const preview = document.getElementById('dataPreview');
+            preview.innerHTML = `
+                <h4>💽 ข้อมูลใน Local:</h4>
+                <pre>${JSON.stringify(localData, null, 2)}</pre>
+            `;
+        }
+        
+        // Export/Import
+        function exportToFile() {
+            const dataStr = JSON.stringify(localData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `office-supply-backup-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            
+            showStatus('downloadStatus', '📤 Export ไฟล์สำเร็จ!', 'success');
+        }
+        
+        function importFromFile() {
+            const file = document.getElementById('importFile').files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    
+                    if (importedData.items) {
+                        localStorage.setItem('office-items', JSON.stringify(importedData.items));
+                        localData.items = importedData.items;
+                    }
+                    
+                    if (importedData.bags) {
+                        localStorage.setItem('office-bags', JSON.stringify(importedData.bags));
+                        localData.bags = importedData.bags;
+                    }
+                    
+                    if (importedData.events) {
+                        localStorage.setItem('office-events', JSON.stringify(importedData.events));
+                        localData.events = importedData.events;
+                    }
+                    
+                    updateLocalStats();
+                    showStatus('downloadStatus', '📁 Import ไฟล์สำเร็จ!', 'success');
+                    
+                } catch (error) {
+                    showStatus('downloadStatus', `❌ Import ไฟล์ไม่สำเร็จ: ${error.message}`, 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+        
+        async function uploadToCloud() {
+            if (!cloudApiUrl) {
+                showStatus('downloadStatus', 'กรุณาทดสอบการเชื่อมต่อ Cloud ก่อน', 'error');
+                return;
+            }
+            
+            if (confirm('คุณแน่ใจหรือไม่ที่จะอัพโหลดข้อมูล Local ไป Cloud?')) {
+                showLoading(true);
+                
+                try {
+                    const response = await fetch(`${cloudApiUrl}/sync.php?action=import`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(localData)
+                    });
+                    
+                    if (response.ok) {
+                        showStatus('downloadStatus', '☁️ อัพโหลดไป Cloud สำเร็จ!', 'success');
+                    } else {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                    
+                } catch (error) {
+                    showStatus('downloadStatus', `❌ อัพโหลดไม่สำเร็จ: ${error.message}`, 'error');
+                } finally {
+                    showLoading(false);
+                }
+            }
+        }
+        
+        // Utility Functions
+        function showStatus(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+        
+        function showLoading(show) {
+            document.getElementById('loadingIndicator').style.display = show ? 'block' : 'none';
+        }
+    </script>
+</body>
+</html>

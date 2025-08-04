@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบจัดเก็บวัสดุสำนักงาน</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1><i class="fas fa-box"></i> ระบบจัดเก็บวัสดุสำนักงาน</h1>
+            <nav class="nav">
+                <button class="nav-btn active" data-section="items">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>จัดเก็บสินค้า</span>
+                </button>
+                <button class="nav-btn" data-section="bags">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span>จัดการกระเป๋า</span>
+                </button>
+                <button class="nav-btn" data-section="events">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>จัดการอีเวนต์</span>
+                </button>
+                <button class="nav-btn" data-section="returns">
+                    <i class="fas fa-undo"></i>
+                    <span>คืนสินค้า</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <!-- Items Section -->
+            <section id="items" class="section active">
+                <div class="section-header">
+                    <h2><i class="fas fa-box"></i> จัดเก็บสินค้า</h2>
+                    <div class="header-actions">
+                        <button class="btn btn-primary" id="add-item-btn">
+                            <i class="fas fa-plus"></i> เพิ่มสินค้าใหม่
+                        </button>
+                        <button class="btn btn-secondary" id="export-items-btn">
+                            <i class="fas fa-download"></i> ส่งออกข้อมูล
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Add Item Form -->
+                <div class="form-container" id="item-form-container" style="display: none;">
+                    <form id="item-form" class="form">
+                        <h3>เพิ่มสินค้าใหม่</h3>
+                        <div class="form-group">
+                            <label for="item-name">ชื่อสินค้า *</label>
+                            <input type="text" id="item-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="purchase-date">วันที่ซื้อ *</label>
+                            <input type="date" id="purchase-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="purchase-price">ราคาที่ซื้อ (บาท) *</label>
+                            <input type="number" id="purchase-price" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="receipt-photo">รูปใบเสร็จ</label>
+                            <input type="file" id="receipt-photo" accept="image/*">
+                            <div class="photo-preview" id="receipt-preview"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="item-photo">รูปสินค้า</label>
+                            <input type="file" id="item-photo" accept="image/*">
+                            <div class="photo-preview" id="item-preview"></div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">บันทึกสินค้า</button>
+                            <button type="button" class="btn btn-secondary" id="cancel-item-btn">ยกเลิก</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Items List -->
+                <div class="items-grid" id="items-grid"></div>
+            </section>
+
+            <!-- Other sections same as original -->
+            <section id="bags" class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-shopping-bag"></i> จัดการกระเป๋า</h2>
+                    <button class="btn btn-primary" id="add-bag-btn">
+                        <i class="fas fa-plus"></i> สร้างกระเป๋าใหม่
+                    </button>
+                </div>
+                <div class="bags-grid" id="bags-grid"></div>
+            </section>
+
+            <section id="events" class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-calendar-alt"></i> จัดการอีเวนต์</h2>
+                    <button class="btn btn-primary" id="add-event-btn">
+                        <i class="fas fa-plus"></i> สร้างอีเวนต์ใหม่
+                    </button>
+                </div>
+                <div class="events-grid" id="events-grid"></div>
+            </section>
+
+            <section id="returns" class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-undo"></i> คืนสินค้า</h2>
+                </div>
+                <div class="returns-grid" id="returns-grid"></div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        // Simple localStorage-based system
+        let items = JSON.parse(localStorage.getItem('office-items') || '[]');
+        let bags = JSON.parse(localStorage.getItem('office-bags') || '[]');
+        let events = JSON.parse(localStorage.getItem('office-events') || '[]');
+
+        function saveData() {
+            localStorage.setItem('office-items', JSON.stringify(items));
+            localStorage.setItem('office-bags', JSON.stringify(bags));
+            localStorage.setItem('office-events', JSON.stringify(events));
+        }
+
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString('th-TH');
+        }
+
+        function formatPrice(price) {
+            return new Intl.NumberFormat('th-TH', {
+                style: 'currency',
+                currency: 'THB'
+            }).format(price);
+        }
+
+        // Navigation
+        function initNavigation() {
+            const navButtons = document.querySelectorAll('.nav-btn');
+            const sections = document.querySelectorAll('.section');
+
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetSection = button.dataset.section;
+                    
+                    navButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    
+                    sections.forEach(section => section.classList.remove('active'));
+                    document.getElementById(targetSection).classList.add('active');
+                    
+                    refreshSection(targetSection);
+                });
+            });
+        }
+
+        function refreshSection(section) {
+            switch(section) {
+                case 'items':
+                    renderItems();
+                    break;
+                case 'bags':
+                    renderBags();
+                    break;
+                case 'events':
+                    renderEvents();
+                    break;
+                case 'returns':
+                    renderReturns();
+                    break;
+            }
+        }
+
+        // Items management
+        function initItemManagement() {
+            const addItemBtn = document.getElementById('add-item-btn');
+            const itemFormContainer = document.getElementById('item-form-container');
+            const itemForm = document.getElementById('item-form');
+            const cancelItemBtn = document.getElementById('cancel-item-btn');
+
+            addItemBtn.addEventListener('click', () => {
+                itemFormContainer.style.display = 'block';
+                itemForm.reset();
+                document.getElementById('receipt-preview').innerHTML = '';
+                document.getElementById('item-preview').innerHTML = '';
+            });
+
+            cancelItemBtn.addEventListener('click', () => {
+                itemFormContainer.style.display = 'none';
+            });
+
+            itemForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const name = document.getElementById('item-name').value.trim();
+                const date = document.getElementById('purchase-date').value;
+                const price = document.getElementById('purchase-price').value;
+                
+                if (!name || !date || !price) {
+                    alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+                    return;
+                }
+
+                const item = {
+                    id: generateId(),
+                    name,
+                    purchaseDate: date,
+                    price: parseFloat(price),
+                    status: 'available',
+                    bagId: null,
+                    bagName: null,
+                    createdAt: new Date().toISOString()
+                };
+
+                items.push(item);
+                saveData();
+                renderItems();
+                itemFormContainer.style.display = 'none';
+                alert('เพิ่มสินค้าเรียบร้อยแล้ว');
+            });
+        }
+
+        function renderItems() {
+            const grid = document.getElementById('items-grid');
+            
+            if (items.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-box-open"></i>
+                        <h3>ยังไม่มีสินค้าในระบบ</h3>
+                        <p>คลิกปุ่ม "เพิ่มสินค้าใหม่" เพื่อเริ่มต้น</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = items.map(item => `
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">${item.name}</div>
+                            <div class="card-subtitle">ซื้อเมื่อ: ${formatDate(item.purchaseDate)}</div>
+                        </div>
+                        <span class="status-badge status-${item.status}">
+                            ${item.status === 'available' ? 'พร้อมใช้งาน' : item.status}
+                        </span>
+                    </div>
+                    <div class="card-content">
+                        <p><strong>ราคา:</strong> ${formatPrice(item.price)}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderBags() {
+            const grid = document.getElementById('bags-grid');
+            grid.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-shopping-bag"></i>
+                    <h3>ฟีเจอร์กระเป๋า</h3>
+                    <p>กำลังพัฒนา</p>
+                </div>
+            `;
+        }
+
+        function renderEvents() {
+            const grid = document.getElementById('events-grid');
+            grid.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-calendar-alt"></i>
+                    <h3>ฟีเจอร์อีเวนต์</h3>
+                    <p>กำลังพัฒนา</p>
+                </div>
+            `;
+        }
+
+        function renderReturns() {
+            const grid = document.getElementById('returns-grid');
+            grid.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-undo"></i>
+                    <h3>ฟีเจอร์คืนสินค้า</h3>
+                    <p>กำลังพัฒนา</p>
+                </div>
+            `;
+        }
+
+        // Export
+        function initExport() {
+            const exportBtn = document.getElementById('export-items-btn');
+            if (exportBtn) {
+                exportBtn.addEventListener('click', () => {
+                    const data = { items, bags, events, exportDate: new Date().toISOString() };
+                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `office-supply-backup-${new Date().toISOString().split('T')[0]}.json`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    alert('ส่งออกข้อมูลเรียบร้อยแล้ว');
+                });
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Starting simple version...');
+            initNavigation();
+            initItemManagement();
+            initExport();
+            renderItems();
+            console.log('System ready!');
+        });
+    </script>
+</body>
+</html> 

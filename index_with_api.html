@@ -1,0 +1,3126 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="theme-color" content="#667eea">
+    <title>ระบบจัดเก็บวัสดุสำนักงาน - API Version</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/brands.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            -webkit-text-size-adjust: 100%;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .api-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .api-status.online {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .api-status.offline {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .nav {
+            display: flex;
+            gap: 0.5rem;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            overflow-x: auto;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            flex: 1;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            min-height: 80px;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .nav-btn.active {
+            background: rgba(255, 255, 255, 0.9);
+            color: #2c3e50;
+        }
+
+        .nav-btn i {
+            font-size: 1.2rem;
+        }
+
+        .main-content {
+            padding: 2rem 0;
+        }
+
+        .section {
+            display: none;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .section-header h2 {
+            color: #2c3e50;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        /* Mobile responsive improvements */
+        @media (max-width: 768px) {
+            /* Container and layout */
+            .container {
+                padding: 10px !important;
+            }
+            
+            .main-content {
+                padding: 10px !important;
+            }
+            
+            /* Navigation */
+            .nav {
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 8px !important;
+                padding: 10px !important;
+            }
+            
+            .nav-btn {
+                padding: 12px 8px !important;
+                font-size: 0.85rem !important;
+                min-height: 60px !important;
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                justify-content: center !important;
+            }
+            
+            .nav-btn i {
+                font-size: 1.2rem !important;
+                margin-bottom: 4px !important;
+            }
+            
+            .nav-btn span {
+                font-size: 0.7rem !important;
+                line-height: 1.1 !important;
+                text-align: center !important;
+            }
+            
+            /* Section headers */
+            .section-header {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 1rem !important;
+                margin-bottom: 1rem !important;
+            }
+            
+            .section-header h2 {
+                font-size: 1.3rem !important;
+                text-align: center !important;
+            }
+            
+            .header-actions {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.5rem;
+            }
+            
+            .sort-controls {
+                order: 1;
+                margin-right: 0 !important;
+            }
+            
+            .search-container {
+                order: 2;
+            }
+            
+            .btn {
+                order: 3;
+                padding: 12px 16px;
+                font-size: 1rem;
+            }
+            
+            /* Dashboard specific */
+            .dashboard-summary {
+                grid-template-columns: 1fr !important;
+                gap: 1rem !important;
+                margin-bottom: 1.5rem !important;
+            }
+            
+            .summary-card {
+                padding: 1rem !important;
+            }
+            
+            .summary-card h3 {
+                font-size: 1.5rem !important;
+            }
+            
+            .summary-card p {
+                font-size: 0.9rem !important;
+            }
+            
+            .summary-card i {
+                font-size: 2rem !important;
+            }
+            
+                         /* Status charts and activities */
+             .dashboard-status {
+                 grid-template-columns: 1fr !important;
+                 gap: 1rem !important;
+                 margin-bottom: 1.5rem !important;
+             }
+             
+             .dashboard-activities {
+                 grid-template-columns: 1fr !important;
+                 gap: 1rem !important;
+             }
+             
+             .status-overview,
+             .activity-card {
+                 margin-bottom: 1rem;
+                 padding: 1rem !important;
+             }
+             
+             .status-overview h3,
+             .activity-card h3 {
+                 font-size: 1.1rem !important;
+             }
+             
+             /* Active events mobile layout */
+             .active-event-item .event-content {
+                 flex-direction: column !important;
+                 align-items: stretch !important;
+                 gap: 0.75rem !important;
+             }
+             
+             .active-event-item .event-status {
+                 text-align: left !important;
+                 display: flex !important;
+                 justify-content: space-between !important;
+                 align-items: center !important;
+             }
+             
+             /* Expensive items mobile layout */
+             .expensive-item {
+                 flex-direction: column !important;
+                 align-items: stretch !important;
+                 gap: 0.5rem !important;
+             }
+             
+             .expensive-item .item-price {
+                 text-align: left !important;
+                 display: flex !important;
+                 justify-content: space-between !important;
+                 align-items: center !important;
+             }
+            
+            /* Cards */
+            .card {
+                margin-bottom: 1rem !important;
+                padding: 1rem !important;
+            }
+            
+            .card h3 {
+                font-size: 1.1rem !important;
+            }
+            
+            .card p {
+                font-size: 0.9rem !important;
+                margin: 0.3rem 0 !important;
+            }
+            
+            .card-actions {
+                flex-direction: column;
+                gap: 0.5rem;
+                margin-top: 1rem !important;
+            }
+            
+            .card-actions .btn {
+                padding: 10px 12px !important;
+                font-size: 0.9rem !important;
+                width: 100% !important;
+            }
+            
+            /* Grids */
+            .items-grid,
+            .bags-grid,
+            .events-grid,
+            .returns-grid {
+                grid-template-columns: 1fr !important;
+                gap: 1rem !important;
+            }
+            
+            /* Forms */
+            .form-group {
+                margin-bottom: 1rem !important;
+            }
+            
+            .form-control {
+                padding: 12px !important;
+                font-size: 16px !important; /* Prevent zoom on iOS */
+            }
+            
+            .search-input {
+                font-size: 16px !important; /* Prevent zoom on iOS */
+                padding: 12px 16px 12px 40px !important;
+            }
+            
+            select {
+                font-size: 16px !important; /* Prevent zoom on iOS */
+                padding: 12px !important;
+            }
+
+            .sort-controls select {
+                width: 100%;
+                min-width: auto;
+            }
+            
+            /* Modals */
+            .modal-content {
+                margin: 5vh 10px !important;
+                max-width: none !important;
+                width: calc(100vw - 20px) !important;
+                max-height: 85vh !important;
+                overflow-y: auto !important;
+            }
+            
+            .modal-header {
+                padding: 1rem !important;
+            }
+            
+            .modal-header h3 {
+                font-size: 1.2rem !important;
+            }
+            
+            .modal-body {
+                padding: 1rem !important;
+            }
+            
+            .modal-actions {
+                flex-direction: column !important;
+                gap: 0.5rem !important;
+            }
+            
+            .modal-actions .btn {
+                padding: 12px 16px !important;
+                font-size: 1rem !important;
+                width: 100% !important;
+            }
+            
+            /* Status badges */
+            .status-badge {
+                font-size: 0.8rem !important;
+                padding: 4px 8px !important;
+            }
+            
+            /* Notifications */
+            .notification {
+                width: calc(100vw - 20px) !important;
+                left: 10px !important;
+                right: 10px !important;
+                margin: 0 !important;
+            }
+            
+            /* Empty state */
+            .empty-state {
+                padding: 2rem 1rem !important;
+            }
+            
+            .empty-state h3 {
+                font-size: 1.2rem !important;
+            }
+            
+            .empty-state p {
+                font-size: 0.9rem !important;
+            }
+            
+            /* Table responsive */
+            .table-responsive {
+                overflow-x: auto !important;
+            }
+            
+            /* Utility classes for mobile */
+            .mobile-hide {
+                display: none !important;
+            }
+            
+            .mobile-block {
+                display: block !important;
+            }
+            
+            .mobile-flex {
+                display: flex !important;
+            }
+        }
+        
+        /* Extra small screens */
+        @media (max-width: 480px) {
+            .nav {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+            
+            .nav-btn {
+                padding: 10px 6px !important;
+                font-size: 0.8rem !important;
+                min-height: 55px !important;
+            }
+            
+            .nav-btn span {
+                font-size: 0.65rem !important;
+            }
+            
+            .summary-card {
+                padding: 0.8rem !important;
+            }
+            
+            .summary-card h3 {
+                font-size: 1.3rem !important;
+            }
+            
+            .card {
+                padding: 0.8rem !important;
+            }
+            
+            .modal-content {
+                margin: 2vh 5px !important;
+                width: calc(100vw - 10px) !important;
+                max-height: 92vh !important;
+            }
+        }
+
+        .search-container {
+            position: relative;
+        }
+
+        .search-input {
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 2px solid #e1e8ed;
+            border-radius: 25px;
+            background: white;
+            font-size: 0.9rem;
+            width: 250px;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #657786;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+        }
+
+        .form-container {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .form {
+            max-width: 600px;
+        }
+
+        .form h3 {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .photo-preview {
+            margin-top: 1rem;
+        }
+
+        .photo-preview img {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .items-grid,
+        .bags-grid,
+        .events-grid,
+        .returns-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border: 1px solid #e1e8ed;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.25rem;
+        }
+
+        .card-subtitle {
+            font-size: 0.9rem;
+            color: #657786;
+        }
+
+        .card-content {
+            margin: 1rem 0;
+        }
+
+        .card-content p {
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .card-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-available {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-in-bag {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-on-event {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-event {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #657786;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .close {
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            color: #657786;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .close:hover {
+            background: #f1f3f4;
+            color: #2c3e50;
+        }
+
+        .info-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .info-list li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e1e8ed;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .info-list li:last-child {
+            border-bottom: none;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .bag-checkbox,
+        .bag-option {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .bag-checkbox:hover,
+        .bag-option:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .bag-checkbox input,
+        .bag-option input {
+            width: auto;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: #28a745;
+        }
+
+        .notification.error {
+            background: #dc3545;
+        }
+
+        .notification.info {
+            background: #17a2b8;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 15px;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .nav {
+                gap: 0.25rem;
+            }
+
+            .nav-btn {
+                flex-direction: column;
+                padding: 0.5rem;
+                font-size: 0.8rem;
+                min-width: 80px;
+            }
+
+            .section-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+
+            .header-actions {
+                justify-content: center;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+
+            .items-grid,
+            .bags-grid,
+            .events-grid,
+            .returns-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .modal-content {
+                margin: 10% auto;
+                width: 95%;
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1><i class="fas fa-boxes"></i> ระบบจัดเก็บวัสดุสำนักงาน</h1>
+                <div class="api-status" id="api-status">
+                    <i class="fas fa-wifi"></i>
+                    <span>กำลังเชื่อมต่อ...</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <!-- Navigation -->
+            <nav class="nav">
+                <button class="nav-btn active" data-section="dashboard">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </button>
+                <button class="nav-btn" data-section="items">
+                    <i class="fas fa-box"></i>
+                    <span>จัดเก็บสินค้า</span>
+                </button>
+                <button class="nav-btn" data-section="bags">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span>จัดการกระเป๋า</span>
+                </button>
+                <button class="nav-btn" data-section="events">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>จัดการอีเวนต์</span>
+                </button>
+                <button class="nav-btn" data-section="returns">
+                    <i class="fas fa-undo"></i>
+                    <span>คืนสินค้า</span>
+                </button>
+
+                <button class="nav-btn" onclick="syncData()">
+                    <i class="fas fa-sync" id="sync-icon"></i>
+                    <span>ซิงค์ข้อมูล</span>
+                </button>
+            </nav>
+
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="section active">
+                <div class="section-header">
+                    <h2><i class="fas fa-chart-line"></i> Dashboard</h2>
+                    <div class="header-actions">
+                        <button class="btn btn-secondary" onclick="refreshDashboard()">
+                            <i class="fas fa-refresh"></i> รีเฟรช
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Summary Cards -->
+                <div class="dashboard-summary" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                    <div class="summary-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h3 style="margin: 0; font-size: 2rem; font-weight: bold;" id="total-items">0</h3>
+                                <p style="margin: 0.5rem 0 0; opacity: 0.9;">สินค้าทั้งหมด</p>
+                            </div>
+                            <i class="fas fa-box" style="font-size: 2.5rem; opacity: 0.7;"></i>
+                        </div>
+                    </div>
+
+                    <div class="summary-card" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h3 style="margin: 0; font-size: 2rem; font-weight: bold;" id="total-bags">0</h3>
+                                <p style="margin: 0.5rem 0 0; opacity: 0.9;">กระเป๋าทั้งหมด</p>
+                            </div>
+                            <i class="fas fa-shopping-bag" style="font-size: 2.5rem; opacity: 0.7;"></i>
+                        </div>
+                    </div>
+
+                    <div class="summary-card" style="background: linear-gradient(135deg, #fd7e14 0%, #e83e8c 100%); color: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 5px 15px rgba(253, 126, 20, 0.3);">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h3 style="margin: 0; font-size: 2rem; font-weight: bold;" id="total-events">0</h3>
+                                <p style="margin: 0.5rem 0 0; opacity: 0.9;">อีเวนต์ทั้งหมด</p>
+                            </div>
+                            <i class="fas fa-calendar-alt" style="font-size: 2.5rem; opacity: 0.7;"></i>
+                        </div>
+                    </div>
+
+                    <div class="summary-card" style="background: linear-gradient(135deg, #dc3545 0%, #6f42c1 100%); color: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h3 style="margin: 0; font-size: 2rem; font-weight: bold;" id="total-value">฿0</h3>
+                                <p style="margin: 0.5rem 0 0; opacity: 0.9;">มูลค่ารวม</p>
+                            </div>
+                            <i class="fas fa-dollar-sign" style="font-size: 2.5rem; opacity: 0.7;"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status Overview -->
+                <div class="dashboard-status" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                    <!-- Items Status -->
+                    <div class="status-overview" style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);">
+                        <h3 style="margin: 0 0 1rem; color: #2c3e50; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-box"></i> สถานะสินค้า
+                        </h3>
+                        <div id="items-status-chart"></div>
+                    </div>
+
+                    <!-- Bags Status -->
+                    <div class="status-overview" style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);">
+                        <h3 style="margin: 0 0 1rem; color: #2c3e50; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-shopping-bag"></i> สถานะกระเป๋า
+                        </h3>
+                        <div id="bags-status-chart"></div>
+                    </div>
+                </div>
+
+                <!-- Recent Activities -->
+                <div class="dashboard-activities" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 1.5rem;">
+                    <!-- Top Expensive Items -->
+                    <div class="activity-card" style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);">
+                        <h3 style="margin: 0 0 1rem; color: #2c3e50; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-gem"></i> สินค้าราคาแพงที่สุด
+                        </h3>
+                        <div id="expensive-items"></div>
+                    </div>
+
+                    <!-- Active Events -->
+                    <div class="activity-card" style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);">
+                        <h3 style="margin: 0 0 1rem; color: #2c3e50; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-calendar-check"></i> อีเวนต์ที่กำลังดำเนินการ
+                        </h3>
+                        <div id="active-events"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Items Section -->
+            <section id="items" class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-box"></i> จัดเก็บสินค้า</h2>
+                    <div class="header-actions">
+                        <div class="search-container">
+                            <input type="text" id="items-search" placeholder="ค้นหาสินค้า..." class="search-input">
+                            <i class="fas fa-search search-icon"></i>
+                        </div>
+                        <button class="btn btn-primary" id="add-item-btn">
+                            <i class="fas fa-plus"></i> เพิ่มสินค้าใหม่
+                        </button>
+                        <button class="btn btn-secondary" id="export-items-btn">
+                            <i class="fas fa-download"></i> ส่งออกข้อมูล
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Add Item Form -->
+                <div class="form-container" id="item-form-container" style="display: none;">
+                    <form id="item-form" class="form">
+                        <h3>เพิ่มสินค้าใหม่</h3>
+                        <div class="form-group">
+                            <label for="item-name">ชื่อสินค้า *</label>
+                            <input type="text" id="item-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="purchase-date">วันที่ซื้อ *</label>
+                            <input type="date" id="purchase-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="purchase-price">ราคาที่ซื้อ (บาท) *</label>
+                            <input type="number" id="purchase-price" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="receipt-photo">รูปใบเสร็จ</label>
+                            <input type="file" id="receipt-photo" accept="image/*">
+                            <div class="photo-preview" id="receipt-preview"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="item-photo">รูปสินค้า</label>
+                            <input type="file" id="item-photo" accept="image/*">
+                            <div class="photo-preview" id="item-preview"></div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary" id="save-item-btn">บันทึกสินค้า</button>
+                            <button type="button" class="btn btn-secondary" id="cancel-item-btn">ยกเลิก</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Items List -->
+                <div class="items-grid" id="items-grid"></div>
+            </section>
+
+            <!-- Bags Section -->
+            <section id="bags" class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-shopping-bag"></i> จัดการกระเป๋า</h2>
+                    <div class="header-actions">
+                        <div class="search-container">
+                            <input type="text" id="bags-search" placeholder="ค้นหากระเป๋า..." class="search-input">
+                            <i class="fas fa-search search-icon"></i>
+                        </div>
+                        <button class="btn btn-primary" id="add-bag-btn">
+                            <i class="fas fa-plus"></i> สร้างกระเป๋าใหม่
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Add Bag Form -->
+                <div class="form-container" id="bag-form-container" style="display: none;">
+                    <form id="bag-form" class="form">
+                        <h3>สร้างกระเป๋าใหม่</h3>
+                        <div class="form-group">
+                            <label for="bag-name">ชื่อกระเป๋า *</label>
+                            <input type="text" id="bag-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="bag-responsible">ผู้รับผิดชอบ *</label>
+                            <input type="text" id="bag-responsible" required>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">สร้างกระเป๋า</button>
+                            <button type="button" class="btn btn-secondary" id="cancel-bag-btn">ยกเลิก</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Bags List -->
+                <div class="bags-grid" id="bags-grid"></div>
+            </section>
+
+            <!-- Events Section -->
+            <section id="events" class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-calendar-alt"></i> จัดการอีเวนต์</h2>
+                    <div class="header-actions">
+                        <div class="sort-controls" style="display: flex; gap: 0.5rem; align-items: center; margin-right: 1rem;">
+                            <i class="fas fa-sort" style="color: #657786;"></i>
+                            <select id="event-sort-select" class="form-control" style="width: auto; min-width: 150px;" onchange="sortEvents()">
+                                <option value="date-desc">วันที่ (ใหม่-เก่า)</option>
+                                <option value="date-asc">วันที่ (เก่า-ใหม่)</option>
+                                <option value="name-asc">ชื่อ (A-Z)</option>
+                                <option value="name-desc">ชื่อ (Z-A)</option>
+                                <option value="status">สถานะ</option>
+                                <option value="location">สถานที่</option>
+                                <option value="customer">ลูกค้า</option>
+                            </select>
+                        </div>
+                        <div class="search-container">
+                            <input type="text" id="events-search" placeholder="ค้นหาอีเวนต์..." class="search-input">
+                            <i class="fas fa-search search-icon"></i>
+                        </div>
+                        <button class="btn btn-primary" id="add-event-btn">
+                            <i class="fas fa-plus"></i> สร้างอีเวนต์ใหม่
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Add Event Form -->
+                <div class="form-container" id="event-form-container" style="display: none;">
+                    <form id="event-form" class="form">
+                        <h3>สร้างอีเวนต์ใหม่</h3>
+                        <div class="form-group">
+                            <label for="event-name">ชื่ออีเวนต์ *</label>
+                            <input type="text" id="event-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="event-location">สถานที่ *</label>
+                            <input type="text" id="event-location" placeholder="กรอกชื่อสถานที่หรือที่อยู่" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="event-customer">ชื่อลูกค้า *</label>
+                            <input type="text" id="event-customer" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="event-responsible">ผู้รับผิดชอบ *</label>
+                            <input type="text" id="event-responsible" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="event-date">วันที่อีเวนต์ *</label>
+                            <input type="date" id="event-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="event-time">เวลาอีเวนต์ *</label>
+                            <input type="time" id="event-time" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="event-bags">เลือกกระเป๋า *</label>
+                            <div class="checkbox-group" id="event-bags-list"></div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">สร้างอีเวนต์</button>
+                            <button type="button" class="btn btn-secondary" id="cancel-event-btn">ยกเลิก</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Events List -->
+                <div class="events-grid" id="events-grid"></div>
+            </section>
+
+            <!-- Returns Section -->
+            <section id="returns" class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-undo"></i> คืนสินค้า</h2>
+                </div>
+                <div class="returns-grid" id="returns-grid"></div>
+            </section>
+
+
+        </div>
+    </main>
+
+    <!-- Modals -->
+    <div id="item-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="item-modal-content"></div>
+        </div>
+    </div>
+
+    <div id="bag-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="bag-modal-content"></div>
+        </div>
+    </div>
+
+    <script>
+        // API Configuration
+        const API_BASE = './api';
+        const USE_API = true;
+        let isOnline = false;
+        
+        // Global variables
+        let items = [];
+        let bags = [];
+        let events = [];
+
+        // API Helper Functions
+        async function apiRequest(endpoint, options = {}) {
+            const url = `${API_BASE}${endpoint}`;
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                ...options
+            };
+            
+            try {
+                const response = await fetch(url, config);
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'API request failed');
+                }
+                
+                updateAPIStatus(true);
+                return data;
+            } catch (error) {
+                console.error('API Error:', error);
+                updateAPIStatus(false);
+                throw error;
+            }
+        }
+
+        // API Services
+        const ItemsAPI = {
+            getAll: () => apiRequest('/items.php'),
+            add: (item) => apiRequest('/items.php', {
+                method: 'POST',
+                body: JSON.stringify(item)
+            }),
+            update: (item) => apiRequest('/items.php', {
+                method: 'PUT',
+                body: JSON.stringify(item)
+            }),
+            delete: (id) => apiRequest(`/items.php?id=${id}`, {
+                method: 'DELETE'
+            })
+        };
+
+        const BagsAPI = {
+            getAll: () => apiRequest('/bags.php'),
+            add: (bag) => apiRequest('/bags.php', {
+                method: 'POST',
+                body: JSON.stringify(bag)
+            }),
+            update: (bag) => apiRequest('/bags.php', {
+                method: 'PUT',
+                body: JSON.stringify(bag)
+            }),
+            addItem: (bagId, itemId) => apiRequest('/bags.php', {
+                method: 'PUT',
+                body: JSON.stringify({
+                    id: bagId,
+                    action: 'addItem',
+                    itemId: itemId
+                })
+            }),
+            removeItem: (bagId, itemId) => apiRequest('/bags.php', {
+                method: 'PUT',
+                body: JSON.stringify({
+                    id: bagId,
+                    action: 'removeItem',
+                    itemId: itemId
+                })
+            }),
+            delete: (id) => apiRequest(`/bags.php?id=${id}`, {
+                method: 'DELETE'
+            })
+        };
+
+        const EventsAPI = {
+            getAll: () => apiRequest('/events.php'),
+            add: (event) => apiRequest('/events.php', {
+                method: 'POST',
+                body: JSON.stringify(event)
+            }),
+            update: (event) => apiRequest('/events.php', {
+                method: 'PUT',
+                body: JSON.stringify(event)
+            }),
+            returnItems: (id) => apiRequest(`/events.php?id=${id}`, {
+                method: 'DELETE'
+            })
+        };
+
+        const SyncAPI = {
+            getAll: () => apiRequest('/sync.php'),
+            export: () => {
+                window.open(`${API_BASE}/sync.php?action=export`, '_blank');
+            }
+        };
+
+        // Update API Status Indicator
+        function updateAPIStatus(online) {
+            isOnline = online;
+            const statusEl = document.getElementById('api-status');
+            
+            if (online) {
+                statusEl.className = 'api-status online';
+                statusEl.innerHTML = '<i class="fas fa-wifi"></i><span>ออนไลน์</span>';
+            } else {
+                statusEl.className = 'api-status offline';
+                statusEl.innerHTML = '<i class="fas fa-wifi-slash"></i><span>ออฟไลน์</span>';
+            }
+        }
+
+        // Data Loading Functions
+        async function loadDataFromAPI() {
+            if (!USE_API) return false;
+            
+            try {
+                showNotification('กำลังโหลดข้อมูล...', 'info');
+                
+                const [itemsResult, bagsResult, eventsResult] = await Promise.all([
+                    ItemsAPI.getAll(),
+                    BagsAPI.getAll(),
+                    EventsAPI.getAll()
+                ]);
+                
+                items = itemsResult || [];
+                bags = bagsResult || [];
+                events = eventsResult || [];
+                
+                // Update localStorage as cache
+                saveToLocalStorage();
+                return true;
+                
+            } catch (error) {
+                console.error('Failed to load data from API:', error);
+                return false;
+            }
+        }
+
+        async function syncData() {
+            const syncIcon = document.getElementById('sync-icon');
+            syncIcon.classList.add('fa-spin');
+            
+            try {
+                const success = await loadDataFromAPI();
+                if (success) {
+                    renderAllSections();
+                    showNotification('ซิงค์ข้อมูลสำเร็จ!', 'success');
+                } else {
+                    showNotification('ไม่สามารถซิงค์ข้อมูลได้', 'error');
+                }
+            } finally {
+                syncIcon.classList.remove('fa-spin');
+            }
+        }
+
+        // Utility functions
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        function saveToLocalStorage() {
+            try {
+                localStorage.setItem('office-items', JSON.stringify(items));
+                localStorage.setItem('office-bags', JSON.stringify(bags));
+                localStorage.setItem('office-events', JSON.stringify(events));
+            } catch (error) {
+                console.error('localStorage error:', error);
+            }
+        }
+
+        function loadFromLocalStorage() {
+            items = JSON.parse(localStorage.getItem('office-items') || '[]');
+            bags = JSON.parse(localStorage.getItem('office-bags') || '[]');
+            events = JSON.parse(localStorage.getItem('office-events') || '[]');
+        }
+
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString('th-TH');
+        }
+
+        function formatPrice(price) {
+            return new Intl.NumberFormat('th-TH', {
+                style: 'currency',
+                currency: 'THB'
+            }).format(price);
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => notification.classList.add('show'), 100);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        function createImagePreview(file, container) {
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    container.innerHTML = '';
+                    container.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Navigation functionality
+        function initNavigation() {
+            const navButtons = document.querySelectorAll('.nav-btn[data-section]');
+            const sections = document.querySelectorAll('.section');
+
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetSection = button.dataset.section;
+                    
+                    // Update active nav button
+                    navButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    
+                    // Update active section
+                    sections.forEach(section => section.classList.remove('active'));
+                    const targetEl = document.getElementById(targetSection);
+                    if (targetEl) {
+                        targetEl.classList.add('active');
+                    }
+                    
+                    // Refresh section content
+                    refreshActiveSection(targetSection);
+                });
+            });
+        }
+
+        function refreshActiveSection(section) {
+            switch(section) {
+                case 'dashboard':
+                    renderDashboard();
+                    break;
+                case 'items':
+                    renderItems();
+                    break;
+                case 'bags':
+                    renderBags();
+                    break;
+                case 'events':
+                    renderEvents();
+                    break;
+                case 'returns':
+                    renderReturns();
+                    break;
+
+            }
+        }
+
+        function renderAllSections() {
+            renderDashboard();
+            renderItems();
+            renderBags();
+            renderEvents();
+            renderReturns();
+
+        }
+
+        // Dashboard Functions
+        function renderDashboard() {
+            updateSummaryCards();
+            renderStatusCharts();
+            renderExpensiveItems();
+            renderActiveEvents();
+        }
+
+        function refreshDashboard() {
+            renderDashboard();
+            showNotification('Dashboard อัปเดตแล้ว!', 'success');
+        }
+
+        function updateSummaryCards() {
+            // Total counts
+            document.getElementById('total-items').textContent = items.length;
+            document.getElementById('total-bags').textContent = bags.length;
+            document.getElementById('total-events').textContent = events.length;
+            
+            // Total value
+            const totalValue = items.reduce((sum, item) => sum + (parseFloat(item.price) || 0), 0);
+            document.getElementById('total-value').textContent = formatPrice(totalValue);
+        }
+
+        function renderStatusCharts() {
+            // Items status chart
+            const itemsStatus = items.reduce((acc, item) => {
+                acc[item.status] = (acc[item.status] || 0) + 1;
+                return acc;
+            }, {});
+
+            const itemsStatusHtml = Object.entries(itemsStatus).map(([status, count]) => {
+                const percentage = Math.round((count / items.length) * 100);
+                const statusText = getStatusText(status);
+                const color = getStatusColor(status);
+                
+                return `
+                    <div style="margin-bottom: 1rem;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span style="color: #2c3e50; font-weight: 500;">${statusText}</span>
+                            <span style="color: #657786;">${count} (${percentage}%)</span>
+                        </div>
+                        <div style="background: #e1e8ed; border-radius: 10px; height: 8px; overflow: hidden;">
+                            <div style="background: ${color}; height: 100%; width: ${percentage}%; transition: width 0.3s ease;"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('items-status-chart').innerHTML = itemsStatusHtml || '<p style="color: #657786; text-align: center;">ไม่มีข้อมูล</p>';
+
+            // Bags status chart
+            const bagsStatus = bags.reduce((acc, bag) => {
+                acc[bag.status] = (acc[bag.status] || 0) + 1;
+                return acc;
+            }, {});
+
+            const bagsStatusHtml = Object.entries(bagsStatus).map(([status, count]) => {
+                const percentage = Math.round((count / bags.length) * 100);
+                const statusText = status === 'available' ? 'พร้อมใช้งาน' : 'ใช้งานในอีเวนต์';
+                const color = status === 'available' ? '#28a745' : '#dc3545';
+                
+                return `
+                    <div style="margin-bottom: 1rem;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span style="color: #2c3e50; font-weight: 500;">${statusText}</span>
+                            <span style="color: #657786;">${count} (${percentage}%)</span>
+                        </div>
+                        <div style="background: #e1e8ed; border-radius: 10px; height: 8px; overflow: hidden;">
+                            <div style="background: ${color}; height: 100%; width: ${percentage}%; transition: width 0.3s ease;"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('bags-status-chart').innerHTML = bagsStatusHtml || '<p style="color: #657786; text-align: center;">ไม่มีข้อมูล</p>';
+        }
+
+        function renderExpensiveItems() {
+            const sortedItems = [...items].sort((a, b) => (parseFloat(b.price) || 0) - (parseFloat(a.price) || 0)).slice(0, 5);
+            
+            const expensiveItemsHtml = sortedItems.map((item, index) => `
+                <div class="expensive-item" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; padding: 0.75rem; border: 1px solid #e1e8ed; border-radius: 8px; margin-bottom: 0.5rem; background: ${index === 0 ? '#fff3cd' : 'white'};">
+                    <div class="item-info" style="flex: 1; min-width: 0;">
+                        <strong style="color: #2c3e50; display: block; word-wrap: break-word;">${item.name}</strong>
+                        <small style="color: #657786; display: block; margin-top: 0.25rem;">สถานะ: ${getStatusText(item.status)}</small>
+                    </div>
+                    <div class="item-price" style="text-align: right; flex-shrink: 0;">
+                        <strong style="color: #dc3545; font-size: 1.1rem; white-space: nowrap;">${formatPrice(item.price)}</strong>
+                        ${index === 0 ? '<small style="color: #856404; display: block; margin-top: 0.25rem;"><i class="fas fa-crown"></i> แพงที่สุด</small>' : ''}
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('expensive-items').innerHTML = expensiveItemsHtml || '<p style="color: #657786; text-align: center;">ไม่มีข้อมูล</p>';
+        }
+
+        function renderActiveEvents() {
+            const activeEventsList = events.filter(event => event.status === 'active');
+            
+            const activeEventsHtml = activeEventsList.map(event => `
+                <div class="active-event-item" style="padding: 0.75rem; border: 1px solid #e1e8ed; border-radius: 8px; margin-bottom: 0.5rem; background: #f8f9fa;">
+                    <div class="event-content" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;">
+                        <div class="event-info" style="flex: 1; min-width: 0;">
+                            <strong style="color: #2c3e50; display: block; word-wrap: break-word;">${event.name}</strong>
+                            <small style="color: #657786; display: block; margin-top: 0.25rem;">${event.location} • ${formatDate(event.date)}</small>
+                            <small style="color: #657786; display: block;">ลูกค้า: ${event.customer}</small>
+                        </div>
+                        <div class="event-status" style="text-align: right; flex-shrink: 0;">
+                            <span class="status-badge status-event" style="white-space: nowrap;">กำลังดำเนินการ</span>
+                            <small style="color: #657786; margin-top: 0.25rem; display: block;">${event.bag_count || 0} กระเป๋า</small>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('active-events').innerHTML = activeEventsHtml || '<p style="color: #657786; text-align: center;">ไม่มีอีเวนต์ที่กำลังดำเนินการ</p>';
+        }
+
+        function getStatusColor(status) {
+            switch(status) {
+                case 'available':
+                    return '#28a745';
+                case 'in-bag':
+                    return '#ffc107';
+                case 'on-event':
+                    return '#17a2b8';
+                default:
+                    return '#6c757d';
+            }
+        }
+
+        // LINE Sharing Functions
+                 async function shareEventToLine(eventId) {
+             try {
+                 console.log('Starting share process for event:', eventId);
+                 showNotification('กำลังเตรียมข้อมูลสำหรับแชร์...', 'info');
+                 
+                 const event = events.find(e => e.id === eventId);
+                 if (!event) {
+                     console.error('Event not found in local data:', eventId);
+                     showNotification('ไม่พบข้อมูลอีเวนต์', 'error');
+                     return;
+                 }
+                 
+                 console.log('Found event:', event);
+
+                // Get event details with bags and items
+                let eventDetails;
+                try {
+                    // Get all events with bags first (since single event API might not support withBags)
+                    const allEvents = await apiRequest(`/events.php?withBags=true`);
+                    eventDetails = allEvents.find(e => e.id === eventId);
+                    
+                                         if (!eventDetails) {
+                         showNotification('ไม่พบข้อมูลอีเวนต์', 'error');
+                         return;
+                     }
+                     
+                     console.log('Event details loaded:', eventDetails);
+                } catch (error) {
+                    console.error('API Error:', error);
+                    showNotification('ไม่สามารถโหลดรายละเอียดอีเวนต์ได้', 'error');
+                    return;
+                }
+
+                const shareText = generateEventShareText(eventDetails);
+                const shareUrl = generateEventShareUrl(shareText);
+                
+                // แสดง modal ตัวอย่างก่อนแชร์
+                showSharePreviewModal(shareText, shareUrl);
+                
+            } catch (error) {
+                console.error('Share error:', error);
+                showNotification('เกิดข้อผิดพลาดในการเตรียมข้อมูลแชร์', 'error');
+            }
+        }
+
+        function generateEventShareText(eventDetails) {
+            const event = eventDetails;
+            
+            // Header
+            let text = `🎪 สรุปอีเวนต์: ${event.name}\n`;
+            text += `📅 วันที่: ${formatDate(event.date)}${event.time ? ' เวลา ' + event.time : ''}\n`;
+            text += `📍 สถานที่: ${event.location}\n`;
+            text += `👤 ลูกค้า: ${event.customer}\n`;
+            text += `👨‍💼 ผู้รับผิดชอบ: ${event.responsible}\n`;
+            text += `📊 สถานะ: ${event.status === 'active' ? '🟢 กำลังดำเนินการ' : '✅ เสร็จสิ้น'}\n`;
+            text += `\n`;
+
+                         if (event.bags && event.bags.length > 0) {
+                 text += `🎒 รายการกระเป๋าและอุปกรณ์:\n`;
+                 text += `━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+                 
+                                  console.log('Event bags:', event.bags);
+                 
+                 event.bags.forEach((bag, bagIndex) => {
+                     console.log(`Processing bag ${bagIndex + 1}:`, bag);
+                    text += `\n📦 กระเป๋า: ${bag.name}\n`;
+                    text += `👨‍💼 ผู้รับผิดชอบ: ${bag.responsible}\n`;
+                    
+                    if (bag.items && bag.items.length > 0) {
+                        const totalValue = bag.items.reduce((sum, item) => sum + (parseFloat(item.price) || 0), 0);
+                        text += `💰 มูลค่ารวม: ${formatPrice(totalValue)}\n`;
+                        text += `📝 รายการอุปกรณ์ (${bag.items.length} รายการ):\n`;
+                        
+                        bag.items.forEach((item, itemIndex) => {
+                            text += `   ${itemIndex + 1}. ${item.name}\n`;
+                            text += `      💵 ราคา: ${formatPrice(item.price)}\n`;
+                            text += `      📅 วันที่ซื้อ: ${formatDate(item.purchase_date)}\n`;
+                        });
+                    } else {
+                        text += `📝 ไม่มีอุปกรณ์ในกระเป๋า\n`;
+                    }
+                    
+                    if (bagIndex < event.bags.length - 1) {
+                        text += `\n`;
+                    }
+                });
+                
+                // สรุปรวม
+                const totalItems = event.bags.reduce((sum, bag) => sum + (bag.items ? bag.items.length : 0), 0);
+                const totalValue = event.bags.reduce((sum, bag) => 
+                    sum + (bag.items ? bag.items.reduce((bagSum, item) => bagSum + (parseFloat(item.price) || 0), 0) : 0), 0
+                );
+                
+                text += `\n━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+                text += `📊 สรุปรวม:\n`;
+                text += `🎒 จำนวนกระเป๋า: ${event.bags.length} ใบ\n`;
+                text += `📦 จำนวนอุปกรณ์: ${totalItems} รายการ\n`;
+                text += `💰 มูลค่าทั้งหมด: ${formatPrice(totalValue)}\n`;
+                         } else {
+                 text += `🎒 ไม่มีกระเป๋าในอีเวนต์นี้\n`;
+                 text += `📝 อีเวนต์นี้ยังไม่มีการจัดกระเป๋า\n`;
+                 text += `💡 สามารถเพิ่มกระเป๋าได้ในระบบจัดการ\n`;
+                 console.log('No bags found for event:', event.name);
+             }
+            
+                         text += `\n━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+             text += `📱 Design by xcnn1412
+🌐 Website: example.com
+📧 Contact: xcnn1412@email.com`;
+            
+            return text;
+        }
+
+                 function generateEventShareUrl(text) {
+             try {
+                 // ตรวจสอบความยาวข้อความ (LINE มีข้อจำกัด)
+                 let shareText = text;
+                 if (text.length > 1000) {
+                     // ตัดข้อความให้สั้นลงถ้ายาวเกินไป
+                     shareText = text.substring(0, 950) + '\n\n... (ข้อความเต็มดูในระบบ)';
+                 }
+                 
+                 const encodedText = encodeURIComponent(shareText);
+                 console.log('Generated LINE URL, text length:', shareText.length);
+                 return `https://line.me/R/msg/text/?${encodedText}`;
+             } catch (error) {
+                 console.error('Error generating share URL:', error);
+                 return `https://line.me/R/msg/text/?${encodeURIComponent('ข้อผิดพลาดในการสร้างข้อความแชร์')}`;
+             }
+         }
+
+                 function showSharePreviewModal(shareText, shareUrl) {
+             const modal = document.getElementById('modal');
+             
+             // ตรวจสอบว่า modal element มีอยู่จริง
+             if (!modal) {
+                 console.error('Modal element not found!');
+                 showNotification('ไม่พบ modal element', 'error');
+                 return;
+             }
+             
+             // Check if mobile for responsive design
+             const isMobile = window.innerWidth <= 768;
+             
+             modal.innerHTML = `
+                 <div class="modal-content" style="max-width: ${isMobile ? '95vw' : '600px'}; max-height: 90vh; overflow-y: auto; margin: ${isMobile ? '5vh auto' : '10vh auto'};">
+                     <div class="modal-header">
+                         <h3 style="font-size: ${isMobile ? '1.2rem' : '1.5rem'};"><i class="fab fa-line" style="color: #00C300;"></i> แชร์ไป LINE</h3>
+                         <button class="modal-close" onclick="closeModal()" style="font-size: ${isMobile ? '1.5rem' : '1.8rem'};">&times;</button>
+                     </div>
+                     <div class="modal-body">
+                         <div style="margin-bottom: 1.5rem;">
+                             <h4 style="color: #2c3e50; margin-bottom: 1rem; font-size: ${isMobile ? '1rem' : '1.2rem'};">
+                                 <i class="fas fa-eye"></i> ตัวอย่างข้อความที่จะแชร์:
+                             </h4>
+                             <div style="background: #f8f9fa; border: 1px solid #e1e8ed; border-radius: 8px; padding: ${isMobile ? '0.8rem' : '1rem'}; white-space: pre-wrap; font-family: ${isMobile ? 'system-ui, -apple-system' : 'monospace'}; font-size: ${isMobile ? '0.8rem' : '0.9rem'}; max-height: ${isMobile ? '200px' : '300px'}; overflow-y: auto; line-height: 1.4;">${shareText}</div>
+                         </div>
+                         
+                         <div style="display: flex; gap: ${isMobile ? '0.5rem' : '1rem'}; flex-direction: ${isMobile ? 'column' : 'row'};">
+                             <button class="btn btn-success" onclick="openLineApp('${shareUrl.replace(/'/g, "\\'")}'); event.preventDefault();" style="flex: 1; min-width: ${isMobile ? 'auto' : '200px'}; background: #00C300; border-color: #00C300; padding: ${isMobile ? '12px 16px' : '8px 16px'}; font-size: ${isMobile ? '1rem' : '0.9rem'};">
+                                 <i class="fab fa-line"></i> เปิด LINE แชร์เลย
+                             </button>
+                             <button class="btn btn-info" onclick="copyShareText(\`${shareText.replace(/`/g, '\\`').replace(/\n/g, '\\n')}\`)" style="flex: 1; min-width: ${isMobile ? 'auto' : '150px'}; padding: ${isMobile ? '12px 16px' : '8px 16px'}; font-size: ${isMobile ? '1rem' : '0.9rem'};">
+                                 <i class="fas fa-copy"></i> คัดลอกข้อความ
+                             </button>
+                         </div>
+                         
+                         <div style="margin-top: 1rem; padding: 0.8rem; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px;">
+                             <small style="color: #856404;">
+                                 <i class="fas fa-lightbulb"></i> 
+                                 <strong>เทสต์:</strong> คลิกปุ่มด้านบนเพื่อทดสอบการแชร์ หรือ
+                                 <button onclick="testLineShare(); return false;" style="background: none; border: none; color: #007bff; text-decoration: underline; padding: 0; margin: 0 4px; cursor: pointer;">คลิกที่นี่เพื่อทดสอบ</button>
+                             </small>
+                         </div>
+                         
+                         <div style="margin-top: 1.5rem; padding: ${isMobile ? '0.8rem' : '1rem'}; background: #e8f4fd; border-radius: 8px; border-left: 4px solid #17a2b8;">
+                             <h5 style="color: #0c5460; margin: 0 0 0.5rem 0; font-size: ${isMobile ? '0.9rem' : '1rem'};">
+                                 <i class="fas fa-info-circle"></i> วิธีใช้งาน:
+                             </h5>
+                             <ul style="margin: 0; padding-left: 1.2rem; color: #0c5460; font-size: ${isMobile ? '0.8rem' : '0.9rem'};">
+                                 <li><strong>เปิด LINE แชร์เลย:</strong> เปิดแอป LINE พร้อมข้อความ</li>
+                                 <li><strong>คัดลอกข้อความ:</strong> คัดลอกเพื่อแชร์ที่อื่น</li>
+                                 <li>ข้อความจะมีรายละเอียดครบถ้วนพร้อมอีโมจิ</li>
+                             </ul>
+                         </div>
+                     </div>
+                 </div>
+             `;
+             modal.style.display = 'block';
+         }
+
+                 function openLineApp(shareUrl) {
+             try {
+                 console.log('Opening LINE with URL:', shareUrl);
+                 
+                 // ตรวจสอบว่าเป็น mobile หรือไม่
+                 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                 
+                 if (isMobile) {
+                     // สำหรับ mobile - เปิด LINE app โดยตรง
+                     const link = document.createElement('a');
+                     link.href = shareUrl;
+                     link.target = '_blank';
+                     link.rel = 'noopener noreferrer';
+                     document.body.appendChild(link);
+                     link.click();
+                     document.body.removeChild(link);
+                 } else {
+                     // สำหรับ desktop - เปิด LINE web
+                     window.open(shareUrl, '_blank', 'noopener,noreferrer');
+                 }
+                 
+                 closeModal();
+                 showNotification('เปิด LINE เรียบร้อย!', 'success');
+             } catch (error) {
+                 console.error('Error opening LINE:', error);
+                 showNotification('ไม่สามารถเปิด LINE ได้ ลองคัดลอกข้อความแทน', 'error');
+             }
+         }
+
+        function copyShareText(text) {
+            try {
+                // Clean up the text for better copying
+                const cleanText = text.replace(/\\n/g, '\n').replace(/\\`/g, '`');
+                
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(cleanText).then(() => {
+                        closeModal();
+                        showNotification('คัดลอกข้อความเรียบร้อย!', 'success');
+                    }).catch(() => {
+                        fallbackCopyText(cleanText);
+                    });
+                } else {
+                    fallbackCopyText(cleanText);
+                }
+            } catch (error) {
+                fallbackCopyText(text);
+            }
+        }
+
+                 function fallbackCopyText(text) {
+             const textArea = document.createElement('textarea');
+             textArea.value = text;
+             textArea.style.position = 'fixed';
+             textArea.style.left = '-999999px';
+             textArea.style.top = '-999999px';
+             document.body.appendChild(textArea);
+             textArea.focus();
+             textArea.select();
+             
+             try {
+                 document.execCommand('copy');
+                 closeModal();
+                 showNotification('คัดลอกข้อความเรียบร้อย!', 'success');
+             } catch (err) {
+                 showNotification('ไม่สามารถคัดลอกได้ กรุณาเลือกและคัดลอกเอง', 'error');
+             } finally {
+                 document.body.removeChild(textArea);
+             }
+         }
+
+
+
+         // ฟังก์ชันคัดลอกข้อความ
+         function copyToClipboard(text) {
+             try {
+                 if (navigator.clipboard && window.isSecureContext) {
+                     navigator.clipboard.writeText(text).then(() => {
+                         showNotification('คัดลอกข้อความเรียบร้อย! แชร์ใน LINE ได้เลย', 'success');
+                     }).catch(() => {
+                         fallbackCopy(text);
+                     });
+                 } else {
+                     fallbackCopy(text);
+                 }
+             } catch (error) {
+                 fallbackCopy(text);
+             }
+         }
+
+         function fallbackCopy(text) {
+             const textArea = document.createElement('textarea');
+             textArea.value = text;
+             textArea.style.position = 'fixed';
+             textArea.style.left = '-999999px';
+             textArea.style.top = '-999999px';
+             document.body.appendChild(textArea);
+             textArea.focus();
+             textArea.select();
+             
+             try {
+                 document.execCommand('copy');
+                 showNotification('คัดลอกข้อความเรียบร้อย! แชร์ใน LINE ได้เลย', 'success');
+             } catch (err) {
+                 showNotification('ไม่สามารถคัดลอกได้ กรุณาเลือกข้อความและคัดลอกเอง', 'error');
+                 // แสดงข้อความใน alert เพื่อให้คัดลอกเอง
+                 alert('ข้อความสำหรับแชร์:\n\n' + text);
+             } finally {
+                 document.body.removeChild(textArea);
+             }
+         }
+
+
+
+         // ฟังก์ชันแชร์แบบง่าย (ไม่ใช้ modal)
+         async function simpleShareToLine(eventId) {
+             try {
+                 console.log('Simple share for event:', eventId);
+                 
+                 const event = events.find(e => e.id === eventId);
+                 if (!event) {
+                     alert('ไม่พบข้อมูลอีเวนต์');
+                     return;
+                 }
+                 
+                 showNotification('กำลังโหลดข้อมูลกระเป๋า...', 'info');
+                 
+                 // โหลดข้อมูลอีเวนต์พร้อมกระเป๋า
+                 let eventWithBags;
+                 try {
+                     const allEvents = await apiRequest(`/events.php?withBags=true`);
+                     eventWithBags = allEvents.find(e => e.id === eventId);
+                 } catch (apiError) {
+                     console.error('API Error:', apiError);
+                     eventWithBags = event; // fallback ใช้ข้อมูลเดิม
+                 }
+                 
+                 // สร้างข้อความแชร์แบบครบถ้วน
+                 let shareText = `🎪 อีเวนต์: ${event.name}\n`;
+                 shareText += `📅 วันที่: ${formatDate(event.date)}${event.time ? ' เวลา ' + event.time : ''}\n`;
+                 shareText += `📍 สถานที่: ${event.location}\n`;
+                 shareText += `👤 ลูกค้า: ${event.customer}\n`;
+                 shareText += `📊 สถานะ: ${event.status === 'active' ? '🟢 กำลังดำเนินการ' : '✅ เสร็จสิ้น'}\n\n`;
+                 
+                 // เพิ่มข้อมูลกระเป๋าและสินค้า
+                 if (eventWithBags && eventWithBags.bags && eventWithBags.bags.length > 0) {
+                     eventWithBags.bags.forEach((bag, bagIndex) => {
+                         shareText += `กระเป๋า: ${bag.name}\n`;
+                         shareText += `👨‍💼 ผู้รับผิดชอบ: ${bag.responsible}\n`;
+                         
+                         if (bag.items && bag.items.length > 0) {
+                             bag.items.forEach((item, itemIndex) => {
+                                 shareText += `- ${item.name} (${formatPrice(item.price)})\n`;
+                             });
+                             
+                             const bagTotal = bag.items.reduce((sum, item) => sum + (parseFloat(item.price) || 0), 0);
+                             shareText += `💰 รวม: ${formatPrice(bagTotal)}\n`;
+                         } else {
+                             shareText += `- ยังไม่มีสินค้าในกระเป๋า\n`;
+                         }
+                         
+                         if (bagIndex < eventWithBags.bags.length - 1) {
+                             shareText += `\n`;
+                         }
+                     });
+                     
+                     // สรุปรวมทั้งหมด
+                     const totalItems = eventWithBags.bags.reduce((sum, bag) => sum + (bag.items ? bag.items.length : 0), 0);
+                     const totalValue = eventWithBags.bags.reduce((sum, bag) => 
+                         sum + (bag.items ? bag.items.reduce((bagSum, item) => bagSum + (parseFloat(item.price) || 0), 0) : 0), 0
+                     );
+                     
+                     if (totalItems > 0) {
+                         shareText += `\n📊 สรุป: ${eventWithBags.bags.length} กระเป๋า, ${totalItems} รายการ\n`;
+                         shareText += `💰 มูลค่ารวม: ${formatPrice(totalValue)}\n`;
+                     }
+                 } else {
+                     shareText += `📦 ยังไม่มีกระเป๋าในอีเวนต์นี้\n`;
+                 }
+                 
+                 shareText += `\n📱 Design by xcnn1412`;
+                 
+                 console.log('Generated share text:', shareText);
+                 
+                 // สร้าง URL สำหรับแชร์ LINE
+                 const shareUrl = `https://line.me/R/msg/text/?${encodeURIComponent(shareText)}`;
+                 console.log('Share URL:', shareUrl);
+                 console.log('Share text length:', shareText.length);
+                 
+                 if (confirm('ต้องการแชร์ไป LINE หรือไม่?\n\nข้อความจะรวมข้อมูลกระเป๋าและสินค้าทั้งหมด')) {
+                     // ลองหลายวิธีในการเปิด LINE
+                     try {
+                         // วิธีที่ 1: เปิดใน tab ใหม่
+                         const newWindow = window.open(shareUrl, '_blank', 'noopener,noreferrer');
+                         
+                         if (!newWindow) {
+                             // วิธีที่ 2: ถ้าเปิด tab ไม่ได้ ลองเปิดใน window เดียวกัน
+                             window.location.href = shareUrl;
+                         } else {
+                             showNotification('เปิด LINE เรียบร้อย!', 'success');
+                         }
+                     } catch (error) {
+                         console.error('Error opening LINE:', error);
+                         // วิธีที่ 3: Fallback - คัดลอกข้อความ
+                         copyToClipboard(shareText);
+                         showNotification('ไม่สามารถเปิด LINE ได้ กรุณาคัดลอกข้อความและแชร์เอง', 'warning');
+                     }
+                 }
+                 
+             } catch (error) {
+                 console.error('Simple share error:', error);
+                 showNotification('ข้อผิดพลาดในการแชร์: ' + error.message, 'error');
+             }
+                  }
+
+
+
+         // Items management with API integration
+        function initItemManagement() {
+            const addItemBtn = document.getElementById('add-item-btn');
+            const itemFormContainer = document.getElementById('item-form-container');
+            const itemForm = document.getElementById('item-form');
+            const cancelItemBtn = document.getElementById('cancel-item-btn');
+            
+            if (addItemBtn) {
+                addItemBtn.addEventListener('click', () => {
+                    itemFormContainer.style.display = 'block';
+                    itemForm.reset();
+                    document.getElementById('receipt-preview').innerHTML = '';
+                    document.getElementById('item-preview').innerHTML = '';
+                });
+            }
+
+            if (cancelItemBtn) {
+                cancelItemBtn.addEventListener('click', () => {
+                    itemFormContainer.style.display = 'none';
+                });
+            }
+
+            if (itemForm) {
+                itemForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    
+                    const formData = {
+                        name: document.getElementById('item-name').value.trim(),
+                        purchaseDate: document.getElementById('purchase-date').value,
+                        price: parseFloat(document.getElementById('purchase-price').value),
+                        status: 'available'
+                    };
+
+                    if (!formData.name || !formData.purchaseDate || !formData.price) {
+                        showNotification('กรุณากรอกข้อมูลให้ครบถ้วน', 'error');
+                        return;
+                    }
+
+                    try {
+                        await ItemsAPI.add(formData);
+                        await loadDataFromAPI();
+                        renderItems();
+                        itemFormContainer.style.display = 'none';
+                        showNotification('เพิ่มสินค้าสำเร็จ!', 'success');
+                    } catch (error) {
+                        showNotification('ไม่สามารถเพิ่มสินค้าได้: ' + error.message, 'error');
+                    }
+                });
+            }
+
+            // Image preview handlers
+            const receiptPhoto = document.getElementById('receipt-photo');
+            const itemPhoto = document.getElementById('item-photo');
+            
+            if (receiptPhoto) {
+                receiptPhoto.addEventListener('change', (e) => {
+                    createImagePreview(e.target.files[0], document.getElementById('receipt-preview'));
+                });
+            }
+
+            if (itemPhoto) {
+                itemPhoto.addEventListener('change', (e) => {
+                    createImagePreview(e.target.files[0], document.getElementById('item-preview'));
+                });
+            }
+        }
+
+        function renderItems() {
+            const itemsGrid = document.getElementById('items-grid');
+            
+            if (items.length === 0) {
+                itemsGrid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-box-open"></i>
+                        <h3>ยังไม่มีสินค้าในระบบ</h3>
+                        <p>คลิกปุ่ม "เพิ่มสินค้าใหม่" เพื่อเริ่มต้น</p>
+                    </div>
+                `;
+                return;
+            }
+
+            itemsGrid.innerHTML = items.map(item => `
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">${item.name}</div>
+                            <div class="card-subtitle">ซื้อเมื่อ: ${formatDate(item.purchase_date || item.purchaseDate)}</div>
+                        </div>
+                        <span class="status-badge status-${item.status}">
+                            ${getStatusText(item.status)}
+                        </span>
+                    </div>
+                    ${item.item_photo || item.itemPhoto ? `<img src="${item.item_photo || item.itemPhoto}" alt="${item.name}" class="card-image">` : ''}
+                    <div class="card-content">
+                        <p><strong>ราคา:</strong> ${formatPrice(item.price)}</p>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn btn-primary btn-sm" onclick="viewItemDetails('${item.id}')">
+                            <i class="fas fa-eye"></i> ดู
+                        </button>
+                        ${item.status === 'available' ? `
+                            <button class="btn btn-warning btn-sm" onclick="showAddToBagModal('${item.id}')">
+                                <i class="fas fa-shopping-bag"></i> ใส่กระเป๋า
+                            </button>
+                        ` : ''}
+                        <button class="btn btn-danger btn-sm" onclick="deleteItem('${item.id}')">
+                            <i class="fas fa-trash"></i> ลบ
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getStatusText(status) {
+            switch(status) {
+                case 'available':
+                    return 'พร้อมใช้งาน';
+                case 'in-bag':
+                    return 'อยู่ในกระเป๋า';
+                case 'on-event':
+                    return 'ใช้งานในอีเวนต์';
+                default:
+                    return status;
+            }
+        }
+
+        async function deleteItem(itemId) {
+            if (!confirm('คุณต้องการลบสินค้านี้หรือไม่?')) return;
+            
+            try {
+                await ItemsAPI.delete(itemId);
+                await loadDataFromAPI();
+                renderItems();
+                showNotification('ลบสินค้าสำเร็จ!', 'success');
+            } catch (error) {
+                showNotification('ไม่สามารถลบสินค้าได้: ' + error.message, 'error');
+            }
+        }
+
+        function viewItemDetails(itemId) {
+            const item = items.find(i => i.id === itemId);
+            if (!item) return;
+
+            const modal = document.getElementById('item-modal');
+            const content = document.getElementById('item-modal-content');
+            
+            content.innerHTML = `
+                <h3>${item.name}</h3>
+                <div class="info-list">
+                    <li><strong>วันที่ซื้อ:</strong> <span>${formatDate(item.purchase_date || item.purchaseDate)}</span></li>
+                    <li><strong>ราคา:</strong> <span>${formatPrice(item.price)}</span></li>
+                    <li><strong>สถานะ:</strong> <span class="status-badge status-${item.status}">${getStatusText(item.status)}</span></li>
+                </div>
+            `;
+            
+            modal.style.display = 'block';
+        }
+
+        // Bag Management with API integration
+        function initBagManagement() {
+            const addBagBtn = document.getElementById('add-bag-btn');
+            const bagFormContainer = document.getElementById('bag-form-container');
+            const bagForm = document.getElementById('bag-form');
+            const cancelBagBtn = document.getElementById('cancel-bag-btn');
+
+            if (addBagBtn) {
+                addBagBtn.addEventListener('click', () => {
+                    bagFormContainer.style.display = 'block';
+                    bagForm.reset();
+                });
+            }
+
+            if (cancelBagBtn) {
+                cancelBagBtn.addEventListener('click', () => {
+                    bagFormContainer.style.display = 'none';
+                });
+            }
+
+            if (bagForm) {
+                bagForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    
+                    const formData = {
+                        name: document.getElementById('bag-name').value.trim(),
+                        responsible: document.getElementById('bag-responsible').value.trim(),
+                        status: 'available'
+                    };
+
+                    if (!formData.name || !formData.responsible) {
+                        showNotification('กรุณากรอกข้อมูลให้ครบถ้วน', 'error');
+                        return;
+                    }
+
+                    try {
+                        await BagsAPI.add(formData);
+                        await loadDataFromAPI();
+                        renderBags();
+                        bagFormContainer.style.display = 'none';
+                        showNotification('สร้างกระเป๋าสำเร็จ!', 'success');
+                    } catch (error) {
+                        showNotification('ไม่สามารถสร้างกระเป๋าได้: ' + error.message, 'error');
+                    }
+                });
+            }
+        }
+
+        function renderBags() {
+            const bagsGrid = document.getElementById('bags-grid');
+            
+            if (bags.length === 0) {
+                bagsGrid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-shopping-bag"></i>
+                        <h3>ยังไม่มีกระเป๋า</h3>
+                        <p>คลิก "สร้างกระเป๋าใหม่" เพื่อเริ่มต้น</p>
+                    </div>
+                `;
+                return;
+            }
+
+            bagsGrid.innerHTML = bags.map(bag => `
+                <div class="card">
+                    <div class="card-header">
+                        <h3>${bag.name}</h3>
+                        <span class="status-badge status-${bag.status}">
+                            ${bag.status === 'available' ? 'พร้อมใช้งาน' : 'ใช้งานในอีเวนต์'}
+                        </span>
+                    </div>
+                    <div class="card-content">
+                        <p><strong>ผู้รับผิดชอบ:</strong> ${bag.responsible}</p>
+                        <p><strong>จำนวนสินค้า:</strong> ${bag.item_count || 0} รายการ</p>
+                        ${bag.item_count > 0 ? `<p><strong>มูลค่ารวม:</strong> ${calculateBagValue(bag.id)}</p>` : ''}
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn btn-primary btn-sm" onclick="viewBagDetails('${bag.id}')">
+                            <i class="fas fa-eye"></i> ดู
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteBag('${bag.id}')" 
+                                ${bag.status !== 'available' ? 'disabled' : ''}>
+                            <i class="fas fa-trash"></i> ลบ
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function deleteBag(bagId) {
+            if (!confirm('คุณต้องการลบกระเป๋านี้หรือไม่?')) return;
+            
+            try {
+                await BagsAPI.delete(bagId);
+                await loadDataFromAPI();
+                renderBags();
+                showNotification('ลบกระเป๋าสำเร็จ!', 'success');
+            } catch (error) {
+                showNotification('ไม่สามารถลบกระเป๋าได้: ' + error.message, 'error');
+            }
+        }
+
+        async function viewBagDetails(bagId) {
+            const bag = bags.find(b => b.id === bagId);
+            if (!bag) return;
+            
+            try {
+                // Get bag with items
+                const bagWithItems = await apiRequest(`/bags.php?withItems=true&id=${bagId}`);
+                const bagItems = bagWithItems[0]?.items || [];
+                
+                const itemsHtml = bagItems.length > 0 ? 
+                    bagItems.map(item => `
+                        <div class="bag-item" style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; border: 1px solid #e1e8ed; border-radius: 8px; margin-bottom: 0.5rem;">
+                            <div class="bag-item-info">
+                                <strong>${item.name}</strong><br>
+                                <span style="color: #657786;">ราคา: ${formatPrice(item.price)}</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <span class="status-badge status-${item.status}" style="font-size: 0.8rem; padding: 0.25rem 0.5rem;">
+                                    ${item.status === 'available' ? 'พร้อมใช้งาน' : 
+                                      item.status === 'in-bag' ? 'อยู่ในกระเป๋า' :
+                                      item.status === 'on-event' ? 'On-Event' :
+                                      item.status === 'lost' ? 'สูญหาย' :
+                                      item.status === 'maintenance' ? 'ซ่อมบำรุง' : item.status}
+                                </span>
+                                <button class="btn btn-danger btn-sm" onclick="removeFromBag('${bagId}', '${item.id}')">
+                                    <i class="fas fa-times"></i> นำออก
+                                </button>
+                            </div>
+                        </div>
+                    `).join('') : 
+                    '<p style="text-align: center; color: #657786; padding: 2rem;">ยังไม่มีสินค้าในกระเป๋า</p>';
+                
+                showModal(`
+                    <div class="modal-header">
+                        <h2><i class="fas fa-shopping-bag"></i> รายละเอียดกระเป๋า: ${bag.name}</h2>
+                    </div>
+                    <div class="modal-content">
+                        <div class="bag-info" style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                            <p><strong>ผู้รับผิดชอบ:</strong> ${bag.responsible}</p>
+                            <p><strong>สถานะ:</strong> <span class="status-badge status-${bag.status}">${bag.status === 'available' ? 'พร้อมใช้งาน' : 'ใช้งานในอีเวนต์'}</span></p>
+                            <p><strong>จำนวนสินค้า:</strong> ${bagItems.length} รายการ</p>
+                        </div>
+                        <div class="bag-items">
+                            <h3>สินค้าในกระเป๋า</h3>
+                            ${itemsHtml}
+                        </div>
+                    </div>
+                `);
+                
+            } catch (error) {
+                showNotification('ไม่สามารถโหลดรายละเอียดกระเป๋าได้: ' + error.message, 'error');
+            }
+        }
+        
+        async function removeFromBag(bagId, itemId) {
+            if (!confirm('ต้องการนำสินค้านี้ออกจากกระเป๋าหรือไม่?')) return;
+            
+            try {
+                await BagsAPI.removeItem(bagId, itemId);
+                await loadDataFromAPI();
+                renderAllSections();
+                closeModal();
+                setTimeout(() => viewBagDetails(bagId), 100); // Reopen modal with updated data
+                showNotification('นำสินค้าออกจากกระเป๋าสำเร็จ!', 'success');
+            } catch (error) {
+                showNotification('ไม่สามารถนำสินค้าออกจากกระเป๋าได้: ' + error.message, 'error');
+            }
+        }
+
+        // Event Management with API integration
+        function initEventManagement() {
+            const addEventBtn = document.getElementById('add-event-btn');
+            const eventFormContainer = document.getElementById('event-form-container');
+            const eventForm = document.getElementById('event-form');
+            const cancelEventBtn = document.getElementById('cancel-event-btn');
+
+            if (addEventBtn) {
+                addEventBtn.addEventListener('click', () => {
+                    updateEventBagsList();
+                    eventFormContainer.style.display = 'block';
+                    eventForm.reset();
+                });
+            }
+
+            if (cancelEventBtn) {
+                cancelEventBtn.addEventListener('click', () => {
+                    eventFormContainer.style.display = 'none';
+                });
+            }
+
+            if (eventForm) {
+                eventForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    
+                    const selectedBags = Array.from(document.querySelectorAll('#event-bags-list input:checked'))
+                        .map(checkbox => checkbox.value);
+
+                    const formData = {
+                        name: document.getElementById('event-name').value.trim(),
+                        location: document.getElementById('event-location').value.trim(),
+                        customer: document.getElementById('event-customer').value.trim(),
+                        responsible: document.getElementById('event-responsible').value.trim(),
+                        date: document.getElementById('event-date').value,
+                        time: document.getElementById('event-time').value,
+                        bagIds: selectedBags,
+                        status: 'active'
+                    };
+
+                    if (!formData.name || !formData.location || !formData.customer || 
+                        !formData.responsible || !formData.date || !formData.time) {
+                        showNotification('กรุณากรอกข้อมูลให้ครบถ้วน', 'error');
+                        return;
+                    }
+
+                    if (selectedBags.length === 0) {
+                        showNotification('กรุณาเลือกกระเป๋าอย่างน้อย 1 ใบ', 'error');
+                        return;
+                    }
+
+                    try {
+                        await EventsAPI.add(formData);
+                        await loadDataFromAPI();
+                        renderAllSections();
+                        eventFormContainer.style.display = 'none';
+                        showNotification('สร้างอีเวนต์สำเร็จ!', 'success');
+                    } catch (error) {
+                        showNotification('ไม่สามารถสร้างอีเวนต์ได้: ' + error.message, 'error');
+                    }
+                });
+            }
+        }
+
+        function updateEventBagsList() {
+            const bagsList = document.getElementById('event-bags-list');
+            if (!bagsList) return;
+            
+            const availableBags = bags.filter(bag => bag.status === 'available' && (bag.item_count || 0) > 0);
+            
+            if (availableBags.length === 0) {
+                bagsList.innerHTML = '<p class="no-bags">ไม่มีกระเป๋าที่พร้อมใช้งาน</p>';
+                return;
+            }
+            
+            bagsList.innerHTML = availableBags.map(bag => `
+                <div class="bag-checkbox">
+                    <input type="checkbox" id="event-bag-${bag.id}" value="${bag.id}">
+                    <label for="event-bag-${bag.id}">
+                        <strong>${bag.name}</strong><br>
+                        <small>ผู้รับผิดชอบ: ${bag.responsible} | สินค้า: ${bag.item_count || 0} รายการ</small>
+                    </label>
+                </div>
+            `).join('');
+        }
+
+        function renderEvents() {
+            const eventsGrid = document.getElementById('events-grid');
+            
+            if (events.length === 0) {
+                eventsGrid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-calendar-alt"></i>
+                        <h3>ยังไม่มีอีเวนต์</h3>
+                        <p>คลิก "สร้างอีเวนต์ใหม่" เพื่อเริ่มต้น</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Apply current sort if not already sorted
+            const sortValue = document.getElementById('event-sort-select')?.value;
+            if (sortValue && !window.eventsSorted) {
+                const sorted = applySortToEvents(events, sortValue);
+                renderEventsWithData(sorted);
+                return;
+            }
+
+            eventsGrid.innerHTML = events.map(event => `
+                <div class="card">
+                    <div class="card-header">
+                        <h3>${event.name}</h3>
+                        <span class="status-badge status-${event.status}">
+                            ${event.status === 'active' ? 'กำลังดำเนินการ' : 'เสร็จสิ้น'}
+                        </span>
+                    </div>
+                    <div class="card-content">
+                        <p><strong>สถานที่:</strong> ${event.location}</p>
+                        <p><strong>ลูกค้า:</strong> ${event.customer}</p>
+                        <p><strong>ผู้รับผิดชอบ:</strong> ${event.responsible}</p>
+                        <p><strong>วันที่:</strong> ${formatDate(event.date)} ${event.time || ''}</p>
+                        <p><strong>จำนวนกระเป๋า:</strong> ${event.bag_count || 0} ใบ</p>
+                        <p><strong>สร้างเมื่อ:</strong> ${formatDate(event.created_at)}</p>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn btn-primary btn-sm" onclick="viewEventDetails('${event.id}')">
+                            <i class="fas fa-eye"></i> ดู
+                        </button>
+                        ${event.status === 'active' ? 
+                            `<button class="btn btn-success btn-sm" onclick="returnEventItems('${event.id}')">
+                                <i class="fas fa-undo"></i> คืนสินค้า
+                            </button>` : ''
+                        }
+                        <button class="btn btn-info btn-sm" onclick="simpleShareToLine('${event.id}')" style="background: #00C300; border-color: #00C300;">
+                            <i class="fab fa-line"></i> แชร์
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEvent('${event.id}')">
+                            <i class="fas fa-trash"></i> ${event.status === 'active' ? 'ลบอีเวนต์' : 'ลบ'}
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function returnEventItems(eventId) {
+            if (!confirm('ต้องการคืนสินค้าจากอีเวนต์นี้หรือไม่?')) return;
+            
+            try {
+                await EventsAPI.returnItems(eventId);
+                await loadDataFromAPI();
+                renderAllSections();
+                showNotification('คืนสินค้าสำเร็จ!', 'success');
+            } catch (error) {
+                showNotification('ไม่สามารถคืนสินค้าได้: ' + error.message, 'error');
+            }
+        }
+
+        async function deleteEvent(eventId) {
+            const event = events.find(e => e.id === eventId);
+            if (!event) return;
+            
+            if (event.status === 'active') {
+                if (!confirm('⚠️ อีเวนต์นี้ยังไม่เสร็จสิ้น!\n\nการลบจะทำให้:\n- กระเป๋าและสินค้าทั้งหมดกลับสู่สถานะ "พร้อมใช้งาน"\n- ข้อมูลอีเวนต์จะถูกลบถาวร\n\nต้องการดำเนินการต่อหรือไม่?')) {
+                    return;
+                }
+            } else {
+                if (!confirm(`ต้องการลบอีเวนต์ "${event.name}" หรือไม่?\n\nการดำเนินการนี้ไม่สามารถย้อนกลับได้`)) {
+                    return;
+                }
+            }
+            
+            try {
+                // If active event, return items first
+                if (event.status === 'active') {
+                    await EventsAPI.returnItems(eventId);
+                }
+                
+                // Delete the event
+                await apiRequest(`/events.php?id=${eventId}&action=delete`, { method: 'DELETE' });
+                await loadDataFromAPI();
+                renderAllSections();
+                showNotification('ลบอีเวนต์สำเร็จ!', 'success');
+            } catch (error) {
+                showNotification('ไม่สามารถลบอีเวนต์ได้: ' + error.message, 'error');
+            }
+        }
+
+        async function viewEventDetails(eventId) {
+            const event = events.find(e => e.id === eventId);
+            if (!event) return;
+            
+            try {
+                // Get event with bags
+                const eventWithBags = await apiRequest(`/events.php?withBags=true&id=${eventId}`);
+                const eventBags = eventWithBags[0]?.bags || [];
+                
+                const bagsHtml = eventBags.length > 0 ? 
+                    eventBags.map(bag => {
+                        const itemCount = bag.items ? bag.items.length : 0;
+                        return `
+                            <div class="event-bag" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; border: 1px solid #e1e8ed; border-radius: 8px; margin-bottom: 0.75rem; background: #f8f9fa;">
+                                <div class="event-bag-info">
+                                    <strong>${bag.name}</strong><br>
+                                    <span style="color: #657786;">ผู้รับผิดชอบ: ${bag.responsible}</span><br>
+                                    <span style="color: #657786;">สินค้า: ${itemCount} รายการ</span>
+                                </div>
+                                <button class="btn btn-info btn-sm" onclick="viewBagDetails('${bag.id}')">
+                                    <i class="fas fa-eye"></i> ดูสินค้า
+                                </button>
+                            </div>
+                        `;
+                    }).join('') : 
+                    '<p style="text-align: center; color: #657786; padding: 2rem;">ไม่มีกระเป๋าในอีเวนต์</p>';
+                
+                showModal(`
+                    <div class="modal-header">
+                        <h2><i class="fas fa-calendar-alt"></i> รายละเอียดอีเวนต์: ${event.name}</h2>
+                    </div>
+                    <div class="modal-content">
+                        <div class="event-info" style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                            <p><strong>สถานที่:</strong> ${event.location}</p>
+                            <p><strong>ลูกค้า:</strong> ${event.customer}</p>
+                            <p><strong>ผู้รับผิดชอบ:</strong> ${event.responsible}</p>
+                            <p><strong>วันที่:</strong> ${formatDate(event.date)} ${event.time || ''}</p>
+                            <p><strong>สถานะ:</strong> <span class="status-badge status-${event.status}">${event.status === 'active' ? 'กำลังดำเนินการ' : 'เสร็จสิ้น'}</span></p>
+                            <p><strong>จำนวนกระเป๋า:</strong> ${eventBags.length} ใบ</p>
+                        </div>
+                        <div class="event-bags">
+                            <h3>กระเป๋าในอีเวนต์</h3>
+                            ${bagsHtml}
+                        </div>
+                        <div class="modal-actions" style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e1e8ed; display: flex; gap: 1rem; flex-wrap: wrap;">
+                            ${event.status === 'active' ? 
+                                `<button class="btn btn-success" onclick="closeModal(); returnEventItems('${event.id}')">
+                                    <i class="fas fa-undo"></i> คืนสินค้าจากอีเวนต์
+                                </button>` : ''
+                            }
+                            <button class="btn btn-info" onclick="simpleShareToLine('${event.id}')" style="background: #00C300; border-color: #00C300;">
+                                <i class="fab fa-line"></i> แชร์ไป LINE
+                            </button>
+                            <button class="btn btn-danger" onclick="closeModal(); deleteEvent('${event.id}')">
+                                <i class="fas fa-trash"></i> ลบอีเวนต์
+                            </button>
+                        </div>
+                    </div>
+                `);
+                
+            } catch (error) {
+                showNotification('ไม่สามารถโหลดรายละเอียดอีเวนต์ได้: ' + error.message, 'error');
+            }
+        }
+
+        function renderReturns() {
+            const returnsGrid = document.getElementById('returns-grid');
+            const activeEvents = events.filter(event => event.status === 'active');
+            
+            if (activeEvents.length === 0) {
+                returnsGrid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-undo"></i>
+                        <h3>ไม่มีอีเวนต์ที่ต้องคืนสินค้า</h3>
+                        <p>สร้างอีเวนต์ใหม่เพื่อเริ่มการใช้งาน</p>
+                    </div>
+                `;
+                return;
+            }
+
+            returnsGrid.innerHTML = activeEvents.map(event => `
+                <div class="card">
+                    <div class="card-header">
+                        <h3>${event.name}</h3>
+                        <span class="status-badge status-event">รอคืนสินค้า</span>
+                    </div>
+                    <div class="card-content">
+                        <p><strong>สถานที่:</strong> ${event.location}</p>
+                        <p><strong>ลูกค้า:</strong> ${event.customer}</p>
+                        <p><strong>วันที่:</strong> ${formatDate(event.date)}</p>
+                        <p><strong>กระเป๋า:</strong> ${event.bag_count || 0} ใบ</p>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn btn-success btn-sm" onclick="returnEventItems('${event.id}')">
+                            <i class="fas fa-undo"></i> คืนสินค้า
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Modal management
+        function showModal(content) {
+            let modal = document.getElementById('dynamic-modal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'dynamic-modal';
+                modal.className = 'modal';
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <span class="close" onclick="closeModal()">&times;</span>
+                        <div id="modal-body"></div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            }
+            
+            document.getElementById('modal-body').innerHTML = content;
+            modal.style.display = 'block';
+        }
+        
+        function closeModal() {
+            const modal = document.getElementById('dynamic-modal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+            
+            // Also close other modals
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(m => m.style.display = 'none');
+        }
+
+        function initModals() {
+            const modals = document.querySelectorAll('.modal');
+            const closeButtons = document.querySelectorAll('.close');
+
+            closeButtons.forEach(close => {
+                close.addEventListener('click', () => {
+                    modals.forEach(modal => modal.style.display = 'none');
+                });
+            });
+
+            window.addEventListener('click', (e) => {
+                modals.forEach(modal => {
+                    if (e.target === modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+            });
+        }
+
+        // Export functionality
+        function initExport() {
+            const exportItemsBtn = document.getElementById('export-items-btn');
+            
+            if (exportItemsBtn) {
+                exportItemsBtn.addEventListener('click', () => {
+                    if (USE_API && isOnline) {
+                        SyncAPI.export();
+                    } else {
+                        // Fallback local export
+                        const data = { items, bags, events, exportDate: new Date().toISOString() };
+                        const filename = `office-supply-backup-${new Date().toISOString().split('T')[0]}.json`;
+                        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = filename;
+                        a.click();
+                        URL.revokeObjectURL(url);
+                    }
+                    showNotification('ส่งออกข้อมูลสำเร็จ!', 'success');
+                });
+            }
+        }
+
+        // Add Item to Bag functionality
+        function showAddToBagModal(itemId) {
+            const item = items.find(i => i.id === itemId);
+            if (!item) return;
+            
+            const availableBags = bags.filter(bag => bag.status === 'available');
+            
+            if (availableBags.length === 0) {
+                showNotification('ไม่มีกระเป๋าที่พร้อมใช้งาน กรุณาสร้างกระเป๋าใหม่ก่อน', 'error');
+                return;
+            }
+            
+            const bagsOptions = availableBags.map(bag => 
+                `<div class="bag-option">
+                    <input type="radio" id="bag-${bag.id}" name="selectedBag" value="${bag.id}">
+                    <label for="bag-${bag.id}">
+                        <strong>${bag.name}</strong><br>
+                        <small>ผู้รับผิดชอบ: ${bag.responsible} | สินค้า: ${bag.item_count || 0} รายการ</small>
+                    </label>
+                </div>`
+            ).join('');
+            
+            showModal(`
+                <div class="modal-header">
+                    <h2><i class="fas fa-shopping-bag"></i> เลือกกระเป๋าสำหรับ: ${item.name}</h2>
+                </div>
+                <div class="modal-content">
+                    <div class="item-info">
+                        <p><strong>สินค้า:</strong> ${item.name}</p>
+                        <p><strong>ราคา:</strong> ${formatPrice(item.price)}</p>
+                        <p><strong>วันที่ซื้อ:</strong> ${formatDate(item.purchase_date || item.purchaseDate)}</p>
+                    </div>
+                    <div class="bag-selection">
+                        <h3>เลือกกระเป๋า:</h3>
+                        ${bagsOptions}
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-primary" onclick="confirmAddToBag('${itemId}')">
+                            <i class="fas fa-check"></i> ยืนยัน
+                        </button>
+                        <button class="btn btn-secondary" onclick="closeModal()">
+                            <i class="fas fa-times"></i> ยกเลิก
+                        </button>
+                    </div>
+                </div>
+            `);
+        }
+        
+        async function confirmAddToBag(itemId) {
+            const selectedBag = document.querySelector('input[name="selectedBag"]:checked');
+            if (!selectedBag) {
+                showNotification('กรุณาเลือกกระเป๋า', 'error');
+                return;
+            }
+            
+            const bagId = selectedBag.value;
+            
+            try {
+                await BagsAPI.addItem(bagId, itemId);
+                await loadDataFromAPI();
+                renderAllSections();
+                closeModal();
+                showNotification('ใส่สินค้าลงกระเป๋าสำเร็จ!', 'success');
+            } catch (error) {
+                showNotification('ไม่สามารถใส่สินค้าลงกระเป๋าได้: ' + error.message, 'error');
+            }
+        }
+
+        // Helper function to calculate bag value
+        function calculateBagValue(bagId) {
+            try {
+                const bagItems = items.filter(item => item.bag_id === bagId || item.bagId === bagId);
+                const totalValue = bagItems.reduce((sum, item) => sum + (parseFloat(item.price) || 0), 0);
+                return formatPrice(totalValue);
+            } catch (error) {
+                return formatPrice(0);
+            }
+        }
+
+        // Search functionality
+        function initSearch() {
+            const itemsSearch = document.getElementById('items-search');
+            const bagsSearch = document.getElementById('bags-search');
+            const eventsSearch = document.getElementById('events-search');
+
+            if (itemsSearch) {
+                itemsSearch.addEventListener('input', debounce((e) => {
+                    renderFilteredItems(e.target.value);
+                }, 300));
+            }
+
+            if (bagsSearch) {
+                bagsSearch.addEventListener('input', debounce((e) => {
+                    renderFilteredBags(e.target.value);
+                }, 300));
+            }
+
+            if (eventsSearch) {
+                eventsSearch.addEventListener('input', debounce((e) => {
+                    renderFilteredEvents(e.target.value);
+                }, 300));
+            }
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        function renderFilteredItems(searchTerm) {
+            if (!searchTerm.trim()) {
+                renderItems();
+                return;
+            }
+            
+            const filtered = items.filter(item => 
+                item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                item.status.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            
+            const itemsGrid = document.getElementById('items-grid');
+            if (filtered.length === 0) {
+                itemsGrid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-search"></i>
+                        <h3>ไม่พบสินค้าที่ค้นหา</h3>
+                        <p>ลองใช้คำค้นหาอื่น</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Use same rendering logic as renderItems but with filtered data
+            const originalItems = items;
+            items = filtered;
+            renderItems();
+            items = originalItems;
+        }
+
+        function renderFilteredBags(searchTerm) {
+            if (!searchTerm.trim()) {
+                renderBags();
+                return;
+            }
+            
+            const filtered = bags.filter(bag => 
+                bag.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                bag.responsible.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            
+            const bagsGrid = document.getElementById('bags-grid');
+            if (filtered.length === 0) {
+                bagsGrid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-search"></i>
+                        <h3>ไม่พบกระเป๋าที่ค้นหา</h3>
+                        <p>ลองใช้คำค้นหาอื่น</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const originalBags = bags;
+            bags = filtered;
+            renderBags();
+            bags = originalBags;
+        }
+
+        function renderFilteredEvents(searchTerm) {
+            if (!searchTerm.trim()) {
+                // If no search term, apply current sort and render all
+                const sortValue = document.getElementById('event-sort-select')?.value || 'date-desc';
+                const sorted = applySortToEvents(events, sortValue);
+                renderEventsWithData(sorted);
+                return;
+            }
+            
+            let filtered = events.filter(event => 
+                event.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                event.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                event.customer.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            
+            // Apply current sort to filtered results
+            const sortValue = document.getElementById('event-sort-select')?.value || 'date-desc';
+            filtered = applySortToEvents(filtered, sortValue);
+            
+            const eventsGrid = document.getElementById('events-grid');
+            if (filtered.length === 0) {
+                eventsGrid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-search"></i>
+                        <h3>ไม่พบอีเวนต์ที่ค้นหา</h3>
+                        <p>ลองใช้คำค้นหาอื่น</p>
+                    </div>
+                `;
+                return;
+            }
+
+            renderEventsWithData(filtered);
+        }
+
+        function sortEvents() {
+            const sortValue = document.getElementById('event-sort-select').value;
+            const searchTerm = document.getElementById('events-search')?.value || '';
+            
+            // Get filtered events first
+            let filtered = events;
+            if (searchTerm.trim()) {
+                filtered = events.filter(event => 
+                    event.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    event.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    event.customer.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+            }
+            
+            // Apply sort
+            filtered = applySortToEvents(filtered, sortValue);
+            
+            renderEventsWithData(filtered);
+            showNotification(`เรียงตาม${getSortDisplayName(sortValue)}แล้ว`, 'success');
+        }
+
+        function applySortToEvents(eventList, sortValue) {
+            const sortedEvents = [...eventList];
+            
+            switch (sortValue) {
+                case 'date-asc':
+                    return sortedEvents.sort((a, b) => {
+                        const dateA = new Date(a.date + ' ' + (a.time || '00:00'));
+                        const dateB = new Date(b.date + ' ' + (b.time || '00:00'));
+                        return dateA - dateB;
+                    });
+                    
+                case 'date-desc':
+                    return sortedEvents.sort((a, b) => {
+                        const dateA = new Date(a.date + ' ' + (a.time || '00:00'));
+                        const dateB = new Date(b.date + ' ' + (b.time || '00:00'));
+                        return dateB - dateA;
+                    });
+                    
+                case 'name-asc':
+                    return sortedEvents.sort((a, b) => a.name.localeCompare(b.name, 'th'));
+                    
+                case 'name-desc':
+                    return sortedEvents.sort((a, b) => b.name.localeCompare(a.name, 'th'));
+                    
+                case 'status':
+                    return sortedEvents.sort((a, b) => {
+                        const statusOrder = { 'active': 0, 'completed': 1 };
+                        const statusA = statusOrder[a.status] || 2;
+                        const statusB = statusOrder[b.status] || 2;
+                        if (statusA !== statusB) return statusA - statusB;
+                        // If same status, sort by date desc
+                        const dateA = new Date(a.date + ' ' + (a.time || '00:00'));
+                        const dateB = new Date(b.date + ' ' + (b.time || '00:00'));
+                        return dateB - dateA;
+                    });
+                    
+                case 'location':
+                    return sortedEvents.sort((a, b) => {
+                        const locationCompare = a.location.localeCompare(b.location, 'th');
+                        if (locationCompare !== 0) return locationCompare;
+                        // If same location, sort by date desc
+                        const dateA = new Date(a.date + ' ' + (a.time || '00:00'));
+                        const dateB = new Date(b.date + ' ' + (b.time || '00:00'));
+                        return dateB - dateA;
+                    });
+                    
+                case 'customer':
+                    return sortedEvents.sort((a, b) => {
+                        const customerCompare = a.customer.localeCompare(b.customer, 'th');
+                        if (customerCompare !== 0) return customerCompare;
+                        // If same customer, sort by date desc
+                        const dateA = new Date(a.date + ' ' + (a.time || '00:00'));
+                        const dateB = new Date(b.date + ' ' + (b.time || '00:00'));
+                        return dateB - dateA;
+                    });
+                    
+                default:
+                    return sortedEvents.sort((a, b) => {
+                        const dateA = new Date(a.date + ' ' + (a.time || '00:00'));
+                        const dateB = new Date(b.date + ' ' + (b.time || '00:00'));
+                        return dateB - dateA;
+                    });
+            }
+        }
+
+        function getSortDisplayName(sortValue) {
+            const sortNames = {
+                'date-desc': 'วันที่ (ใหม่-เก่า)',
+                'date-asc': 'วันที่ (เก่า-ใหม่)',
+                'name-asc': 'ชื่อ (A-Z)',
+                'name-desc': 'ชื่อ (Z-A)',
+                'status': 'สถานะ',
+                'location': 'สถานที่',
+                'customer': 'ลูกค้า'
+            };
+            return sortNames[sortValue] || 'วันที่';
+        }
+
+        function renderEventsWithData(eventData) {
+            const originalEvents = events;
+            events = eventData;
+            window.eventsSorted = true; // Flag to prevent double sorting
+            renderEvents();
+            window.eventsSorted = false;
+            events = originalEvents;
+        }
+
+        // Initialize the application
+        async function init() {
+            console.log('Initializing application...');
+            
+            try {
+                initNavigation();
+                initItemManagement();
+                initBagManagement();
+                initEventManagement();
+                initModals();
+                initExport();
+                initSearch();
+
+                // Try to load from API first
+                const apiLoaded = await loadDataFromAPI();
+                
+                if (!apiLoaded) {
+                    // Fallback to localStorage
+                    loadFromLocalStorage();
+                    console.log('Using localStorage fallback');
+                }
+                
+                // Render initial content
+                renderAllSections();
+                
+                console.log('Application initialized successfully!');
+                showNotification('ระบบพร้อมใช้งาน!', 'success');
+                
+            } catch (error) {
+                console.error('Initialization failed:', error);
+                showNotification('เกิดข้อผิดพลาดในการเริ่มต้นระบบ', 'error');
+            }
+        }
+
+
+
+        // Start the application when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, starting initialization...');
+            setTimeout(init, 100);
+        });
+    </script>
+</body>
+</html> 
