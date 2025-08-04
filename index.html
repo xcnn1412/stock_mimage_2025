@@ -9,6 +9,7 @@
     <title>ระบบจัดเก็บวัสดุสำนักงาน - API Version</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/brands.min.css">
+    <script src="utils.js"></script>
     <style>
         * {
             margin: 0;
@@ -3985,12 +3986,6 @@
             const logsSection = document.getElementById('logs');
             if (!logsSection) return;
             
-            // ตรวจสอบว่า LogUtils พร้อมใช้งานหรือไม่
-            if (typeof LogUtils === 'undefined') {
-                console.warn('LogUtils not available, skipping logs section initialization');
-                return;
-            }
-            
             // Add logs section HTML if not exists
             if (!logsSection.querySelector('.logs-container')) {
                 logsSection.innerHTML = `
@@ -4067,8 +4062,10 @@
                 `;
             }
             
-            // Load initial logs
-            loadLogs();
+            // Load initial logs after a short delay to ensure DOM is ready
+            setTimeout(() => {
+                loadLogs();
+            }, 100);
         }
         
         async function loadLogs(page = 1) {
@@ -4076,6 +4073,17 @@
                 // ตรวจสอบว่า LogUtils พร้อมใช้งานหรือไม่
                 if (typeof LogUtils === 'undefined') {
                     console.warn('LogUtils not available');
+                    const tbody = document.getElementById('logs-table-body');
+                    if (tbody) {
+                        tbody.innerHTML = `
+                            <tr>
+                                <td colspan="5" style="padding: 2rem; text-align: center; color: #6c757d;">
+                                    <i class="fas fa-exclamation-triangle"></i> ฟีเจอร์ Logs ไม่พร้อมใช้งาน<br>
+                                    <small>กรุณาตรวจสอบการเชื่อมต่อ API</small>
+                                </td>
+                            </tr>
+                        `;
+                    }
                     return;
                 }
                 
@@ -4101,6 +4109,17 @@
                 
             } catch (error) {
                 console.error('Failed to load logs:', error);
+                const tbody = document.getElementById('logs-table-body');
+                if (tbody) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="5" style="padding: 2rem; text-align: center; color: #dc3545;">
+                                <i class="fas fa-exclamation-circle"></i> ไม่สามารถโหลดข้อมูล logs ได้<br>
+                                <small>${error.message}</small>
+                            </td>
+                        </tr>
+                    `;
+                }
                 showNotification('ไม่สามารถโหลดข้อมูล logs ได้', 'error');
             }
         }
