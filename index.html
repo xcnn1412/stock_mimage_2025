@@ -2371,47 +2371,18 @@
             }
             
             try {
-                // อัปเดต API
-                if (USE_API && navigator.onLine) {
-                    const response = await fetch(`${API_BASE}/items.php`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            id: item.id,
-                            name: item.name,
-                            purchaseDate: item.purchase_date || item.purchaseDate,
-                            price: item.price,
-                            status: item.status,
-                            bagId: item.bag_id
-                        })
-                    });
+                // ใช้ฟังก์ชัน updateItemStatus ใหม่
+                const success = await updateItemStatus(itemId, newStatus, oldStatus);
+                
+                if (success) {
+                    renderItems();
+                    showNotification(`เปลี่ยนสถานะเป็น "${getStatusText(newStatus)}" เรียบร้อยแล้ว`, 'success');
                     
-                    if (!response.ok) {
-                        const errorText = await response.text();
-                        throw new Error(`Failed to update item status: ${errorText}`);
-                    }
-                    
-                    const result = await response.json();
-                    if (!result.success) {
-                        throw new Error('API returned error');
-                    }
+                    // ปิด modal
+                    document.getElementById('item-modal').style.display = 'none';
                 } else {
-                    // บันทึกใน local storage เมื่อออฟไลน์
-                    const existingItems = JSON.parse(localStorage.getItem('items') || '[]');
-                    const itemIndex = existingItems.findIndex(i => i.id === itemId);
-                    if (itemIndex !== -1) {
-                        existingItems[itemIndex] = { ...item };
-                        localStorage.setItem('items', JSON.stringify(existingItems));
-                    }
+                    throw new Error('ไม่สามารถอัปเดตสถานะสินค้าได้');
                 }
-                
-                renderItems();
-                showNotification(`เปลี่ยนสถานะเป็น "${getStatusText(newStatus)}" เรียบร้อยแล้ว`, 'success');
-                
-                // ปิด modal
-                document.getElementById('item-modal').style.display = 'none';
             } catch (error) {
                 console.error('Failed to change item status:', error);
                 showNotification(`เกิดข้อผิดพลาดในการอัปเดตสถานะ: ${error.message}`, 'error');
@@ -2605,6 +2576,9 @@
         async function removeFromBag(bagId, itemId) {
             if (!confirm('ต้องการนำสินค้านี้ออกจากกระเป๋าหรือไม่?')) return;
             
+            const item = items.find(i => i.id === itemId);
+            const bag = bags.find(b => b.id === bagId);
+            
             try {
                 await BagsAPI.removeItem(bagId, itemId);
                 await loadDataFromAPI();
@@ -2612,6 +2586,16 @@
                 closeModal();
                 setTimeout(() => viewBagDetails(bagId), 100); // Reopen modal with updated data
                 showNotification('นำสินค้าออกจากกระเป๋าสำเร็จ!', 'success');
+                
+                // บันทึก Log การนำสินค้าออกจากกระเป๋า
+                try {
+                    await LogUtils.logActivity('update', 'items', itemId, 
+                        { status: 'in-bag', bag_id: bagId, bag_name: bag.name }, 
+                        { status: 'available', bag_id: null }
+                    );
+                } catch (error) {
+                    console.warn('Failed to log remove from bag activity:', error);
+                }
             } catch (error) {
                 showNotification('ไม่สามารถนำสินค้าออกจากกระเป๋าได้: ' + error.message, 'error');
             }
@@ -3285,6 +3269,69 @@
             previewElement.textContent = previewText;
         }
 
+        // ฟังก์ชันสำหรับอัปเดตสถานะสินค้าและบันทึก Log
+        async function updateItemStatus(itemId, newStatus, oldStatus = null) {
+            try {
+                const item = items.find(i => i.id === itemId);
+                if (!item) {
+                    console.error('Item not found:', itemId);
+                    return false;
+                }
+
+                const updateData = {
+                    id: itemId,
+                    status: newStatus,
+                    bagId: null // นำออกจากกระเป๋า
+                };
+                
+                // เพิ่มข้อมูลเพิ่มเติมถ้ามี
+                updateData.name = item.name;
+                updateData.purchaseDate = item.purchase_date || item.purchaseDate;
+                updateData.price = item.price;
+
+                console.log(`Updating item ${item.name} to status: ${newStatus}`);
+
+                // อัปเดตผ่าน API
+                if (USE_API && navigator.onLine) {
+                    const response = await fetch(`${API_BASE}/items.php`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(updateData)
+                    });
+                    
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        console.error(`Failed to update item ${itemId}:`, errorText);
+                        throw new Error(`ไม่สามารถอัปเดตสถานะของ ${item.name} ได้: ${errorText}`);
+                    } else {
+                        const result = await response.json();
+                        console.log(`Successfully updated item ${itemId} to ${newStatus}:`, result);
+                        
+                        // บันทึก Log การเปลี่ยนแปลงสถานะ
+                        try {
+                            await LogUtils.logActivity('update', 'items', itemId, 
+                                { status: oldStatus || item.status }, 
+                                { status: newStatus, item_name: item.name }
+                            );
+                        } catch (error) {
+                            console.warn('Failed to log status change:', error);
+                        }
+                    }
+                }
+                
+                // อัปเดต local data
+                item.status = newStatus;
+                item.bag_id = null;
+                item.bagName = null;
+                
+                return true;
+            } catch (error) {
+                console.error('Error updating item status:', error);
+                showNotification(`ไม่สามารถอัปเดตสถานะสินค้าได้: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
         async function proceedWithReturn(eventId) {
             const eventItems = await getEventItems(eventId);
             const statusUpdates = [];
@@ -3336,53 +3383,10 @@
                     if (update.newStatus !== 'available') {
                         console.log(`Updating item ${update.itemName} to status: ${update.newStatus}`);
                         
-                        // อัปเดตผ่าน API ก่อน (เพื่อให้แน่ใจว่าข้อมูลถูกบันทึก)
-                        if (USE_API && navigator.onLine) {
-                            const item = items.find(i => i.id === update.itemId);
-                            const updateData = {
-                                id: update.itemId,
-                                status: update.newStatus,
-                                bagId: null // นำออกจากกระเป๋า
-                            };
-                            
-                            // เพิ่มข้อมูลเพิ่มเติมถ้ามี
-                            if (item) {
-                                updateData.name = item.name;
-                                updateData.purchaseDate = item.purchase_date || item.purchaseDate;
-                                updateData.price = item.price;
-                            }
-                            
-                            console.log(`Sending API update for item ${update.itemId}:`, updateData);
-                            
-                            const response = await fetch(`${API_BASE}/items.php`, {
-                                method: 'PUT',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify(updateData)
-                            });
-                            
-                            if (!response.ok) {
-                                const errorText = await response.text();
-                                console.error(`Failed to update item ${update.itemId}:`, errorText);
-                                throw new Error(`ไม่สามารถอัปเดตสถานะของ ${update.itemName} ได้: ${errorText}`);
-                            } else {
-                                const result = await response.json();
-                                console.log(`Successfully updated item ${update.itemId} to ${update.newStatus}:`, result);
-                                
-                                // Log the activity
-                                try {
-                                    await LogUtils.logActivity('update', 'items', update.itemId, { status: update.oldStatus }, { status: update.newStatus });
-                                } catch (error) {
-                                    console.warn('Failed to log activity:', error);
-                                }
-                            }
-                        }
-                        
-                        // อัปเดต local data
-                        const item = items.find(i => i.id === update.itemId);
-                        if (item) {
-                            item.status = update.newStatus;
-                            item.bag_id = null;
-                            item.bagName = null;
+                        // ใช้ฟังก์ชัน updateItemStatus ใหม่
+                        const success = await updateItemStatus(update.itemId, update.newStatus, update.oldStatus);
+                        if (!success) {
+                            throw new Error(`ไม่สามารถอัปเดตสถานะของ ${update.itemName} ได้`);
                         }
                     }
                 }
@@ -3679,6 +3683,8 @@
             }
             
             const bagId = selectedBag.value;
+            const item = items.find(i => i.id === itemId);
+            const bag = bags.find(b => b.id === bagId);
             
             try {
                 await BagsAPI.addItem(bagId, itemId);
@@ -3686,6 +3692,16 @@
                 renderAllSections();
                 closeModal();
                 showNotification('ใส่สินค้าลงกระเป๋าสำเร็จ!', 'success');
+                
+                // บันทึก Log การเพิ่มสินค้าลงกระเป๋า
+                try {
+                    await LogUtils.logActivity('update', 'items', itemId, 
+                        { status: item.status, bag_id: null }, 
+                        { status: 'in-bag', bag_id: bagId, bag_name: bag.name }
+                    );
+                } catch (error) {
+                    console.warn('Failed to log add to bag activity:', error);
+                }
             } catch (error) {
                 showNotification('ไม่สามารถใส่สินค้าลงกระเป๋าได้: ' + error.message, 'error');
             }
